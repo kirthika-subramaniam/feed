@@ -34,6 +34,39 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 
     const imageDuration = 4;
 
+    const [imageFiles, setImageFiles] = useState([]);
+
+    // Function to fetch image files
+    const loadImageFiles = async () => {
+        try {
+          const owner = "modelearth";
+          const repo = "requests";
+          const branch = "main";
+    
+          const response = await axios.get(
+            `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+          );
+    
+          const files = response.data.tree.filter((file) =>
+            /\.(jpg|jpeg|gif)$/i.test(file.path)
+          );
+    
+          setImageFiles(
+            files.map((file) => ({
+              name: file.path,
+              url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+            }))
+          );
+        } catch (err) {
+          console.error("Error fetching image files:", err);
+        }
+      };
+
+      useEffect(() => {
+        loadImageFiles();
+        console.log("I'm here")
+      }, []);
+
     useEffect(() => {
         if (mediaList && mediaList.length > 0) {
             processMediaList();
@@ -47,6 +80,8 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
         // Find the NASA feed
         const nasaFeed = mediaList.find(media => media.feed.trim().toLowerCase() === "nasa");
         
+        console.log("Nasa Feed : " + nasaFeed)
+        console.log("I'm here")
         if (nasaFeed) {
             // Load NASA feed first
             await loadFeed(nasaFeed, templistofMedia);
@@ -340,6 +375,16 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 
 
     return (
+        <div>
+            <div className="gallery">
+          {imageFiles.map((file, index) => (
+            <div className="thumbnail" key={index}>
+              <a href={file.url} target="_blank" rel="noopener noreferrer">
+                <img src={file.url} alt={file.name} />
+              </a>
+            </div>
+          ))}
+        </div>
         <div className={`VideoPlayer ${isFullScreen ? 'fullscreen' : ''}`} ref={containerRef}>
             <div className="VideoPlayer__video-container">
                 {isLoading ? (
@@ -451,6 +496,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 </button>
             </div>
         </div>
+    </div>
     </div>
 );
 }
