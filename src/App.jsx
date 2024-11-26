@@ -1,26 +1,3 @@
-<<<<<<< HEAD
-import React, { useContext, useState, useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
-import VideoPlayer from "./VideoPlayer/VideoPlayer";
-import Popup from "./components/Popup/Popup";
-import "./App.scss";
-import { Context } from "./Context/Context";
-import ContextProvider from "./Context/ContextGoogle";
-import reactToWebComponent from "react-to-webcomponent";
-import MemberSense from "./components/MemberSenseComponents/MemberSenseLogin/MemberSense";
-import MemberShowcase from "./components/MemberSenseComponents/MemberShowcase/MemberShowcase";
-import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChannelViewer/DiscordChannelViewer";
-import FullScreenLoader from "./components/FullScreenLoader";
-import {
-  Video,
-  Users,
-  MessageCircle,
-  AlertCircle,
-  Menu,
-  Maximize,
-  Minimize,
-} from "lucide-react";
-=======
 // External dependencies
 import React, { useContext, useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
@@ -40,7 +17,6 @@ import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChan
 // Context
 import { Context } from "./Context/Context";
 import ContextProvider from "./Context/ContextGoogle";
->>>>>>> upstream/main
 
 // Services
 import {
@@ -61,48 +37,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // Web Component Registration
 const VideoPlayerComponent = reactToWebComponent(VideoPlayer, React, ReactDOM);
 customElements.define("video-player-widget", VideoPlayerComponent);
-<<<<<<< HEAD
-
-const generateFakeMembers = (num) => {
-  const names = [
-    "John",
-    "Jane",
-    "Alice",
-    "Bob",
-    "Charlie",
-    "David",
-    "Eva",
-    "Frank",
-    "Grace",
-    "Hannah",
-  ];
-  return Array.from({ length: num }, (_, i) => ({
-    id: i + 1,
-    username: `${names[i % names.length]} ${i + 1}`,
-    avatar: `https://via.placeholder.com/150?text=${names[i % names.length]}`,
-    email:
-      i % 2 === 0
-        ? `${names[i % names.length].toLowerCase()}${i + 1}@example.com`
-        : null,
-    role: "Member",
-  }));
-};
-
-function App() {
-  const [isPopup, setIsPopup] = useState(false);
-  const [currentView, setCurrentView] = useState("FeedPlayer");
-  const [members, setMembers] = useState([]);
-  const { setVideoList, setCurrentVideoSrc } = useContext(Context);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [token, setToken] = useState("");
-=======
 
 function App() {
   // Navigation state
   const [currentView, setCurrentView] = useState("FeedPlayer");
->>>>>>> upstream/main
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -303,24 +241,6 @@ function App() {
     }, 300);
   };
 
-<<<<<<< HEAD
-  const handleValidToken = (validToken) => {
-    setToken(validToken);
-    setError("");
-  };
-  const handleLogout = () => {
-    setIsTransitioning(true);
-    setIsLoading(true);
-    setTimeout(() => {
-      setToken("");
-      setCurrentView("MemberSense");
-      setIsTransitioning(false);
-      setTimeout(() => setIsLoading(false), 500);
-    }, 300);
-  };
-
-=======
->>>>>>> upstream/main
   const handleFullScreen = () => {
     if (!isFullScreen) {
       if (appRef.current.requestFullscreen) {
@@ -341,31 +261,10 @@ function App() {
     }
   };
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-      if (!isFullScreen) setIsMenuOpen(false);
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
-
-  const memberSenseDropdownItems = [
-    { id: "Showcase", icon: Users, label: "Member Showcase" },
-    { id: "DiscordViewer", icon: MessageCircle, label: "Discord Viewer" },
-  ];
-
-  const renderContent = () => {
-    const commonProps = { isFullScreen };
-=======
   // Render helpers
   const renderContent = () => {
     const commonProps = { isFullScreen };
     
->>>>>>> upstream/main
     switch (currentView) {
       case "FeedPlayer":
         return (
@@ -388,10 +287,6 @@ function App() {
       case "MemberSense":
         return (
           <MemberSense
-<<<<<<< HEAD
-            onValidToken={handleValidToken}
-            initialToken={token}
-=======
             onValidToken={handleLogin}
             initialToken={token}
             isLoading={isLoading}
@@ -402,18 +297,11 @@ function App() {
             isFullScreen={isFullScreen}
             useMockData={useMockData}
             onToggleMockData={() => setUseMockData(!useMockData)}
->>>>>>> upstream/main
             {...commonProps}
           />
         );
       case "Showcase":
         return (
-<<<<<<< HEAD
-          <MemberShowcase token={token} members={members} {...commonProps} />
-        );
-      case "DiscordViewer":
-        return <DiscordChannelViewer token={token} {...commonProps} />;
-=======
           <MemberShowcase
             token={token}
             members={members}
@@ -432,7 +320,6 @@ function App() {
             {...commonProps}
           />
         );
->>>>>>> upstream/main
       default:
         return <div>Select a view</div>;
     }
@@ -461,7 +348,6 @@ function App() {
     ));
   };
 
-  // Main render
   return (
     <ContextProvider>
       <div className={`App ${isFullScreen ? "fullscreen" : ""}`} ref={appRef}>
@@ -513,10 +399,6 @@ function App() {
             <p>{error}</p>
           </div>
         )}
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/main
         <main
           className={`app-content ${isTransitioning ? "fade-out" : "fade-in"}`}
         >

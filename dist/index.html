@@ -149,7 +149,8 @@
       // Function to handle messages from the iframe
       function handleMessage(event) {
         if (allowedOrigins.includes(event.origin)) {
-          const { index, source } = event.data;
+          const { index, url, title, explanation, source } = event.data;
+          console.log("url: " + url + " , title: " + title + " , explanation: " + explanation);
           if (
             (source === "loop" || source === "feedmain") &&
             !isNaN(index) &&
