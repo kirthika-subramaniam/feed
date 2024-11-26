@@ -8,7 +8,6 @@ import PropTypes from "prop-types";
 function VideoPlayer({
   autoplay = false,
   isFullScreen,
-  setIsFullScreen,
   handleFullScreen,
 }) {
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context);
@@ -538,7 +537,6 @@ function VideoPlayer({
 VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   isFullScreen: PropTypes.bool.isRequired,
-  setIsFullScreen: PropTypes.bool.isRequired,
   handleFullScreen: PropTypes.func.isRequired,
 };
 
