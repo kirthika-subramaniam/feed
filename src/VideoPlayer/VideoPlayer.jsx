@@ -417,8 +417,8 @@ function VideoPlayer({
         {!isLoading && currentMedia && (
           <div className="VideoPlayer__overlay">
             <div className="VideoPlayer__info">
-              <h2>{currentMedia.title || "Untitled"}{data.title}</h2>
-              <p>{currentMedia.text || "No description available"}{data.explanation}</p>
+              <h2>{currentMedia.title || "Untitled"}</h2>
+              <p>{currentMedia.text || "No description available"}</p>
             </div>
           </div>
         )}
