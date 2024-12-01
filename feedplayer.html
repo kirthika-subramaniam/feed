@@ -10,18 +10,6 @@
     <link rel="stylesheet" crossorigin href="dist/assets/feedplayer.css" />
     <script>
       loadMarkdown("/feed/README.md", "readmeDiv", "_parent");
-      window.onload = function () {
-        if (performance.navigation.type === 1) {
-          // This is a page refresh - preserve only the swiper type
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
-          const currentSwiperType = hashParams.get("swiper");
-          if (currentSwiperType)
-            history.replaceState(null, null, `#swiper=${currentSwiperType}`);
-          else history.replaceState(null, null, " ");
-        }
-        // Always show the active swiper after page load
-        showActiveSwiper();
-      };
     </script>
     <style>
       .swiper-filmstrip {
@@ -56,7 +44,7 @@
 
   <body>
     <div id="root">
-      <img src="src/assets/images/intro-a.jpg" style="border-radius: 20px" />
+      <img src="src/assets/images/intro-a.jpg" alt="img" style="border-radius: 20px" />
       <div style="margin-top: 20px; z-index: 1000">
         Broken by build. Manually update the index .js and .css files to include
         the newly built ID values.
@@ -72,6 +60,7 @@
 
     <script>
       const allowedOrigins = ["https://model.earth", "https://raydendarkus.github.io", "http://localhost:8887", "http://localhost:5173",];
+      const GITHUB_JSON_URL = "https://raw.githubusercontent.com/RaydenDarkus/feed/refs/heads/main/data/swiper-data.json";
 
       function showActiveSwiper() {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -100,6 +89,7 @@
           }
         }
       }
+
       // Function to handle messages from the iframe
       function handleMessage(event) {
         if (allowedOrigins.includes(event.origin)) {
@@ -112,6 +102,18 @@
           }
         }
       }
+
+      window.onload = () => {
+        const navigationType = performance.getEntriesByType("navigation")[0].type;
+        if (navigationType === "reload") {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const currentSwiperType = hashParams.get("swiper");
+          if (currentSwiperType) history.replaceState(null, null, `#swiper=${currentSwiperType}`);
+          else history.replaceState(null, null, " ");
+        }
+        showActiveSwiper();
+      };
+
       // Set up event listeners
       window.addEventListener("hashchange", handleHashChange);
       window.addEventListener("message", handleMessage);
