@@ -24,5 +24,6 @@ dist-ssr
 
 yarn.lock
 env/
+.env.local
 
 venv/
