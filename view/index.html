@@ -133,7 +133,8 @@ and (max-device-width : 480px) {
 		{"value":"usda","name":"USDA Nutrition Label"},
 		{"value":"farmfresh","name":"Farm Fresh (Michigan)"},
     {"value":"nasa","name":"NASA Image Feed"},
-    {"value":"serp","name":"Serp API (CORS)"},
+    {"value":"comtrade","name":"Comtrade (CORS)"},
+    {"value":"serp","name":"Serp APIname (CORS)"},
 
     {"value":"gdc","name":"GDC Google Data Commons - Forests"},
     {"value":"US:Count_Person","name":"GDC US State Populations"},
@@ -307,7 +308,11 @@ function displayFeed() {
 
 		url = "https://news.google.com/foryou";
 		activeFeed.useCORS = true;
-
+	} else if (hash.feed == "comtrade") {
+		// comtrade not woring yet, returns:  Unexpected end of JSON input
+		urlX = "https://comtradeapi.un.org/public/v1/getDATariffline/C/M/HS?reporter=USA&year=2020&trade_type=1&maxrec=20";
+		url = "https://comtradeapi.un.org/public/v1/getDATariffline/C/M/HS?reporter=USA&ps=2020&rg=1&fmt=json&maxrec=20";
+		activeFeed.useCORS = true;
 	} else if (hash.feed == "food") {
 		// data-commons/docs/food/network/api_to_path.js
 		url = "https://api.nal.usda.gov/fdc/v1/foods/list?dataType=Foundation,SR%20Legacy&pageSize=5&pageNumber=1&api_key=bLecediTVa2sWd8AegmUZ9o7DxYFSYoef9B4i1Ml";
