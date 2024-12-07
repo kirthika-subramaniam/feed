@@ -7,13 +7,15 @@
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="./assets/favicon-32x32.png"
+      href="favicons/favicon-32x32.png"
     />
     <title>Feed Player - For Images, Video and Text</title>
     <script
       type="text/javascript"
       src="https://model.earth/localsite/js/localsite.js?showheader=true"
     ></script>
+    <script type="module" crossorigin src="dist/assets/feedplayer.js"></script>
+    <link rel="stylesheet" crossorigin href="dist/assets/feedplayer.css" />
     <script>
       loadMarkdown("/feed/README.md", "readmeDiv", "_parent");
     </script>
@@ -46,14 +48,12 @@
         }
       }
     </style>
-    <script type="module" crossorigin src="./assets/feedplayer.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/feedplayer.css">
   </head>
 
   <body>
     <div id="root">
       <img
-        src="./assets/intro-a.jpg"
+        src="src/assets/images/intro-a.jpg"
         alt="img"
         style="border-radius: 20px"
       />
