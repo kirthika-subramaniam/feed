@@ -34,38 +34,47 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 
     const imageDuration = 4;
 
-    const [imageFiles, setImageFiles] = useState([]);
+    // const [imageFiles, setImageFiles] = useState([]);
 
     // Function to fetch image files
-    const loadImageFiles = async () => {
-        try {
-          const owner = "modelearth";
-          const repo = "requests";
-          const branch = "main";
-    
-          const response = await axios.get(
-            `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
-          );
-    
-          const files = response.data.tree.filter((file) =>
-            /\.(jpg|jpeg|gif)$/i.test(file.path)
-          );
-    
-          setImageFiles(
-            files.map((file) => ({
-              name: file.path,
-              url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
-            }))
-          );
-        } catch (err) {
-          console.error("Error fetching image files:", err);
-        }
-      };
+    // const loadImageFiles = async () => {
+    //     setIsLoading(true);
+    //     try {
+    //         const owner = "modelearth";
+    //         const repo = "requests";
+    //         const branch = "main";
 
-      useEffect(() => {
-        loadImageFiles();
-        console.log("I'm here")
-      }, []);
+    //         const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
+    //         console.log("Repo data URL : " + repoFeed.url)
+
+    //         // const response = await axios.get(
+    //         //     `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+    //         // );
+
+    //         const response = await axios.get(
+    //             `${repoFeed.url}`
+    //         );
+
+    //         const files = response.data.tree.filter((file) =>
+    //             /\.(jpg|jpeg|gif)$/i.test(file.path)
+    //         );
+
+    //         setImageFiles(
+    //             files.map((file) => ({
+    //                 name: file.path,
+    //                 url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+    //             }))
+    //         );
+    //     } catch (err) {
+    //         console.error("Error fetching image files:", err);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (mediaList && mediaList.length > 0) {
+    //         loadImageFiles();
+    //     }
+    // }, [mediaList]);
 
     useEffect(() => {
         if (mediaList && mediaList.length > 0) {
@@ -76,23 +85,22 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
     const processMediaList = async () => {
         setIsLoading(true);
         const templistofMedia = {};
-        
+
         // Find the NASA feed
         const nasaFeed = mediaList.find(media => media.feed.trim().toLowerCase() === "nasa");
-        
         console.log("Nasa Feed : " + nasaFeed)
-        console.log("I'm here")
+
         if (nasaFeed) {
             // Load NASA feed first
             await loadFeed(nasaFeed, templistofMedia);
             setLoadedFeeds(["nasa"]);
-            
+
             // Set initial media
             setListofMedia(templistofMedia);
             setSelectedMediaList(templistofMedia[nasaFeed.title]);
             setCurrentMedia(templistofMedia[nasaFeed.title][0]);
         }
-        
+
         setIsLoading(false);
     };
 
@@ -102,18 +110,18 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
             const mediaItems = await fetchMediaFromAPI(media);
             templistofMedia[media.title] = Array.isArray(mediaItems) ? mediaItems : [mediaItems];
             setLoadedFeeds(prev => [...prev, media.feed.trim().toLowerCase()]);
-            setListofMedia(prev => ({...prev, [media.title]: templistofMedia[media.title]}));
+            setListofMedia(prev => ({ ...prev, [media.title]: templistofMedia[media.title] }));
         } catch (error) {
             console.error(`Error processing media with title ${media.title}:`, error);
             templistofMedia[media.title] = [];
         }
         setLoadingFeeds(prev => ({ ...prev, [media.title]: false }));
     };
-    
+
     const fetchMediaFromAPI = async (media) => {
         try {
             const response = await axios.get(media.url);
-            
+
             switch (media.feed.trim().toLowerCase()) {
                 case "seeclickfix-311":
                     return response.data.issues.map(item => ({
@@ -136,6 +144,45 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
                         }
                         return photos;
                     });
+                case "repo":
+                    const owner = "modelearth";
+                    const repo = "requests";
+                    const branch = "main";
+
+                    const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
+                    console.log("Repo data URL : " + repoFeed.url)
+
+                    const responseRepo = await axios.get(
+                        `${repoFeed.url}`
+                    );
+
+                    // const files = responseRepo.data.tree.filter((file) =>
+                    //     /\.(jpg|jpeg|gif)$/i.test(file.path)
+                    // );
+
+                    // setImageFiles(
+                    //     files.map((file) => ({
+                    //         name: file.path,
+                    //         url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+                    //     }))
+                    // );
+
+                    return responseRepo.data.tree
+                        .filter(file => /\.(jpg|jpeg|gif)$/i.test(file.path))
+                        .map(file => ({
+                            url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+                            text: "No description available",
+                            title: file.path.split("/").pop(),
+                        }));
+
+                // return data.tree
+                //     .filter(file => /\.(jpg|jpeg|gif)$/i.test(file.path)) // Filter image files
+                //     .map(file => ({
+                //         url: `https://raw.githubusercontent.com/${data.owner}/${data.repo}/${data.branch}/${file.path}`,
+                //         text: "No description available",
+                //         title: file.path.split("/").pop(), // Extract the file name
+                //     }));
+
                 default:
                     return response.data.map(item => ({
                         url: item.hdurl || item.url,
@@ -255,7 +302,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
     const toggleFullScreen = () => {
         // Call the function passed from the parent
         handleFullScreen();
-      };
+    };
 
     const handleVolumeRange = () => {
         if (volumeRangeRef.current) {
@@ -344,7 +391,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
         setCurrentTime([0, 0]);
         setImageElapsed(0);
         setIsPlaying(false);
-        
+
         if (currentMedia && autoplay) {
             play();
         }
@@ -376,129 +423,132 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 
     return (
         <div>
-            <div className="gallery">
-          {imageFiles.map((file, index) => (
-            <div className="thumbnail" key={index}>
-              <a href={file.url} target="_blank" rel="noopener noreferrer">
-                <img src={file.url} alt={file.name} />
-              </a>
-            </div>
-          ))}
-        </div>
-        <div className={`VideoPlayer ${isFullScreen ? 'fullscreen' : ''}`} ref={containerRef}>
-            <div className="VideoPlayer__video-container">
-                {isLoading ? (
-                    <div className="VideoPlayer__loading">
-                        <div className="spinner"></div>
-                        <p>Loading media...</p>
-                    </div>
-                ) : currentMedia && currentMedia.url ? (
-                    isImageFile(currentMedia.url) ? (
-                        <img className="video-image" src={currentMedia.url} alt={currentMedia.title || 'Media'} />
-                    ) : isVideoFile(currentMedia.url) ? (
-                        <video ref={videoRef} src={currentMedia.url} poster='src/assets/videos/intro.jpg' muted={isMute}></video>
+            <div className={`VideoPlayer ${isFullScreen ? 'fullscreen' : ''}`} ref={containerRef}>
+                <div className="VideoPlayer__video-container">
+                    {isLoading ? (
+                        <div className="VideoPlayer__loading">
+                            <div className="spinner"></div>
+                            <p>Loading media...</p>
+                        </div>
+                    ) : currentMedia && currentMedia.url ? (
+                        isImageFile(currentMedia.url) ? (
+                            <img className="video-image" src={currentMedia.url} alt={currentMedia.title || 'Media'} />
+                        ) : isVideoFile(currentMedia.url) ? (
+                            <video ref={videoRef} src={currentMedia.url} poster='src/assets/videos/intro.jpg' muted={isMute}></video>
+                        ) : (
+                            <div className="VideoPlayer__unsupported-media">
+                                <p>Unsupported media type</p>
+                            </div>
+                        )
                     ) : (
-                        <div className="VideoPlayer__unsupported-media">
-                            <p>Unsupported media type</p>
+                        <div className="VideoPlayer__no-media">
+                            <p>No media available</p>
                         </div>
-                    )
-                ) : (
-                    <div className="VideoPlayer__no-media">
-                        <p>No media available</p>
-                    </div>
-                )}
-                {!isLoading && currentMedia && (
-                    <div className="VideoPlayer__overlay">
-                        <div className="VideoPlayer__info">
-                            <h2>{currentMedia.title || 'Untitled'}</h2>
-                            <p>{currentMedia.text || 'No description available'}</p>
+                    )}
+                    {!isLoading && currentMedia && (
+                        <div className="VideoPlayer__overlay">
+                            <div className="VideoPlayer__info">
+                                <h2>{currentMedia.title || 'Untitled'}</h2>
+                                <p>{currentMedia.text || 'No description available'}</p>
+                            </div>
                         </div>
+                    )}
+                    <div className='VideoPlayer__dropdown'>
+                        <div className='VideoPlayer__select'
+                            onClick={() => setIsDropdownActive(!isDropdownActive)}
+                        >
+                            <span>{mediaList && mediaList[index] ? mediaList[index].title : 'Select Media'}</span>
+                            <div className='VideoPlayer__caret'></div>
+                        </div>
+                        <ul className={`VideoPlayer__menu ${isDropdownActive ? 'active' : ''}`}>
+                            {mediaList && mediaList.map((media, idx) => (
+                                <li
+                                    key={idx}
+                                    className={`${currentMediaIndex === idx ? 'active' : ''} ${loadedFeeds.includes(media.feed.trim().toLowerCase()) ? '' : 'loading'}`}
+                                    onClick={() => {
+                                        if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
+                                            setIndex(idx);
+                                            setIsDropdownActive(false);
+                                            setCurrentMediaIndex(0);
+                                            setSelectedMediaList(listofMedia[media.title]);
+                                            setCurrentMedia(listofMedia[media.title][0]);
+                                        } else {
+                                            loadFeed(media, listofMedia);
+                                        }
+                                    }}
+                                >
+                                    {media.title || media.feed}
+                                    {loadingFeeds[media.title] ? " (Loading...)" : (!loadedFeeds.includes(media.feed.trim().toLowerCase()) && " (Click to load)")}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
-                )}
-                <div className='VideoPlayer__dropdown'>
-                    <div className='VideoPlayer__select'
-                        onClick={() => setIsDropdownActive(!isDropdownActive)}
-                    >
-                        <span>{mediaList && mediaList[index] ? mediaList[index].title : 'Select Media'}</span>
-                        <div className='VideoPlayer__caret'></div>
-                    </div>
-                    <ul className={`VideoPlayer__menu ${isDropdownActive ? 'active' : ''}`}>
-                        {mediaList && mediaList.map((media, idx) => (
-                            <li
-                                key={idx}
-                                className={`${currentMediaIndex === idx ? 'active' : ''} ${loadedFeeds.includes(media.feed.trim().toLowerCase()) ? '' : 'loading'}`}
-                                onClick={() => {
-                                    if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
-                                        setIndex(idx);
-                                        setIsDropdownActive(false);
-                                        setCurrentMediaIndex(0);
-                                        setSelectedMediaList(listofMedia[media.title]);
-                                        setCurrentMedia(listofMedia[media.title][0]);
-                                    } else {
-                                        loadFeed(media, listofMedia);
-                                    }
-                                }}
-                            >
-                                {media.title || media.feed}
-                                {loadingFeeds[media.title] ? " (Loading...)" : (!loadedFeeds.includes(media.feed.trim().toLowerCase()) && " (Click to load)")}
-                            </li>
-                        ))}
-                    </ul>
                 </div>
-            </div>
-            <div className="VideoPlayer__controls">
-            <div className="control-group control-group-btn">
-                <button className="control-button prev" onClick={handlePrev}>
-                    <i className="ri-skip-back-fill icon"></i>
-                </button>
-                <button className="control-button play-pause" onClick={handlePlayPause}>
-                    <i className={`ri-${isPlaying ? 'pause' : 'play'}-fill icon`}></i>
-                </button>
-                <button className="control-button next" onClick={handleNext}>
-                    <i className="ri-skip-forward-fill icon"></i>
-                </button>
-                <button className="control-button stop" onClick={stop}>
-                    <i className="ri-stop-fill icon"></i>
-                </button>
-            </div>
-            <div className="control-group control-group-slider">
-                {currentMedia && isVideoFile(currentMedia.url) && (
-                    <>
+                <div className="VideoPlayer__controls">
+                    <div className="control-group control-group-btn">
+                        <button className="control-button prev" onClick={handlePrev}>
+                            <i className="ri-skip-back-fill icon"></i>
+                        </button>
+                        <button className="control-button play-pause" onClick={handlePlayPause}>
+                            <i className={`ri-${isPlaying ? 'pause' : 'play'}-fill icon`}></i>
+                        </button>
+                        <button className="control-button next" onClick={handleNext}>
+                            <i className="ri-skip-forward-fill icon"></i>
+                        </button>
+                        <button className="control-button stop" onClick={stop}>
+                            <i className="ri-stop-fill icon"></i>
+                        </button>
+                    </div>
+                    <div className="control-group control-group-slider">
+                        {currentMedia && isVideoFile(currentMedia.url) && (
+                            <>
+                                <input
+                                    type="range"
+                                    className="range-input"
+                                    ref={videoRangeRef}
+                                    onChange={handleVideoRange}
+                                    max={durationSec}
+                                    value={currentSec}
+                                    min={0}
+                                />
+                                <span className="time">{currentTime[0]}:{currentTime[1]} / {duration[0]}:{duration[1]}</span>
+                            </>
+                        )}
+                    </div>
+                    <div className="control-group control-group-volume">
+                        <button className="control-button volume" onClick={handleMute}>
+                            <i className={`ri-volume-${isMute ? 'mute' : 'up'}-fill`}></i>
+                        </button>
                         <input
                             type="range"
-                            className="range-input"
-                            ref={videoRangeRef}
-                            onChange={handleVideoRange}
-                            max={durationSec}
-                            value={currentSec}
+                            className='range-input'
+                            ref={volumeRangeRef}
+                            max={1}
                             min={0}
+                            value={currentVolume}
+                            onChange={handleVolumeRange}
+                            step={0.1}
                         />
-                        <span className="time">{currentTime[0]}:{currentTime[1]} / {duration[0]}:{duration[1]}</span>
-                    </>
-                )}
+                        <button className="control-button full-screen" onClick={toggleFullScreen}>
+                            <i className={`ri-${isFullScreen ? 'fullscreen-exit' : 'fullscreen'}-line`}></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div className="control-group control-group-volume">
-                <button className="control-button volume" onClick={handleMute}>
-                    <i className={`ri-volume-${isMute ? 'mute' : 'up'}-fill`}></i>
-                </button>
-                <input 
-                    type="range" 
-                    className='range-input' 
-                    ref={volumeRangeRef} 
-                    max={1} 
-                    min={0} 
-                    value={currentVolume} 
-                    onChange={handleVolumeRange} 
-                    step={0.1} 
-                />
-               <button className="control-button full-screen" onClick={toggleFullScreen}>
-    <i className={`ri-${isFullScreen ? 'fullscreen-exit' : 'fullscreen'}-line`}></i>
-</button>
-            </div>
+            {/* <div className="gallery">
+                {imageFiles.map((file, index) => (
+                    // <div className="thumbnail" key={index}>
+                    <div key={index}>
+                        <a href={file.url} target="_blank" rel="noopener noreferrer">
+                            <img src={file.url} alt={file.name} />
+                        </a>
+                    </div>
+                ))}
+            </div> */}
         </div>
-    </div>
-    </div>
-);
+
+
+    );
 }
 
 VideoPlayer.propTypes = {
@@ -508,7 +558,7 @@ VideoPlayer.propTypes = {
 };
 
 VideoPlayer.defaultProps = {
-autoplay: false,
+    autoplay: false,
 };
 
 export default VideoPlayer;
