@@ -38,6 +38,48 @@ function VideoPlayer({
 
   const imageDuration = 4;
 
+  // const [imageFiles, setImageFiles] = useState([]);
+
+  // Function to fetch image files
+  // const loadImageFiles = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //         const owner = "modelearth";
+  //         const repo = "requests";
+  //         const branch = "main";
+
+  //         const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
+  //         console.log("Repo data URL : " + repoFeed.url)
+
+  //         // const response = await axios.get(
+  //         //     `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+  //         // );
+
+  //         const response = await axios.get(
+  //             `${repoFeed.url}`
+  //         );
+
+  //         const files = response.data.tree.filter((file) =>
+  //             /\.(jpg|jpeg|gif)$/i.test(file.path)
+  //         );
+
+  //         setImageFiles(
+  //             files.map((file) => ({
+  //                 name: file.path,
+  //                 url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+  //             }))
+  //         );
+  //     } catch (err) {
+  //         console.error("Error fetching image files:", err);
+  //     }
+  // };
+
+  // useEffect(() => {
+  //     if (mediaList && mediaList.length > 0) {
+  //         loadImageFiles();
+  //     }
+  // }, [mediaList]);
+
   useEffect(() => {
     if (mediaList && mediaList.length > 0) {
       processMediaList();
@@ -112,6 +154,37 @@ function VideoPlayer({
             }
             return photos;
           });
+        case "repo":
+          const owner = "modelearth";
+          const repo = "requests";
+          const branch = "main";
+
+          const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
+          console.log("Repo data URL : " + repoFeed.url)
+
+          const responseRepo = await axios.get(
+            `${repoFeed.url}`
+          );
+
+          // const files = responseRepo.data.tree.filter((file) =>
+          //     /\.(jpg|jpeg|gif)$/i.test(file.path)
+          // );
+
+          // setImageFiles(
+          //     files.map((file) => ({
+          //         name: file.path,
+          //         url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+          //     }))
+          // );
+
+          return responseRepo.data.tree
+            .filter(file => /\.(jpg|jpeg|gif)$/i.test(file.path))
+            .map(file => ({
+              url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
+              text: "No description available",
+              title: file.path.split("/").pop(),
+            }));
+
         default:
           return response.data.map((item) => ({
             url: item.hdurl || item.url,
@@ -351,9 +424,9 @@ function VideoPlayer({
     const handleFullScreenChange = () => {
       setIsFullScreen(
         document.fullscreenElement ||
-          document.webkitFullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullscreenElement
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
       );
     };
 
@@ -441,11 +514,10 @@ function VideoPlayer({
               mediaList.map((media, idx) => (
                 <li
                   key={idx}
-                  className={`${currentMediaIndex === idx ? "active" : ""} ${
-                    loadedFeeds.includes(media.feed.trim().toLowerCase())
+                  className={`${currentMediaIndex === idx ? "active" : ""} ${loadedFeeds.includes(media.feed.trim().toLowerCase())
                       ? ""
                       : "loading"
-                  }`}
+                    }`}
                   onClick={() => {
                     if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
                       setIndex(idx);
@@ -462,7 +534,7 @@ function VideoPlayer({
                   {loadingFeeds[media.title]
                     ? " (Loading...)"
                     : !loadedFeeds.includes(media.feed.trim().toLowerCase()) &&
-                      " (Click to load)"}
+                    " (Click to load)"}
                 </li>
               ))}
           </ul>
@@ -523,13 +595,22 @@ function VideoPlayer({
             onClick={toggleFullScreen}
           >
             <i
-              className={`ri-${
-                isFullScreen ? "fullscreen-exit" : "fullscreen"
-              }-line`}
+              className={`ri-${isFullScreen ? "fullscreen-exit" : "fullscreen"
+                }-line`}
             ></i>
           </button>
         </div>
       </div>
+      {/* <div className="gallery">
+                {imageFiles.map((file, index) => (
+                    // <div className="thumbnail" key={index}>
+                    <div key={index}>
+                        <a href={file.url} target="_blank" rel="noopener noreferrer">
+                            <img src={file.url} alt={file.name} />
+                        </a>
+                    </div>
+                ))}
+        </div> */}
     </div>
   );
 }
