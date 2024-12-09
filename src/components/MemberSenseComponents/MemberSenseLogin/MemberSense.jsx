@@ -114,69 +114,6 @@ const MemberSense = ({
     }
   };
 
-<<<<<<< HEAD
-  return (
-    <div className={`member-sense-wrapper ${isFullScreen ? 'fullscreen' : ''}`}>
-      <div className={`member-sense-container ${isTransitioning ? 'transitioning' : ''}`}>
-      <h2 className="member-sense-title">MemberSense</h2>
-      {parentLoading ? (
-        <div className="loading-container">
-          <Spinner />
-        </div>
-      ) : !serverInfo ? (
-        <form onSubmit={handleTokenSubmit} className="token-form">
-          <div className="token-input-wrapper">
-            <input
-              type={showToken ? "text" : "password"}
-              value={inputToken}
-              onChange={(e) => setInputToken(e.target.value)}
-              placeholder="Enter Discord Bot Token"
-              className="token-input"
-              disabled={isValidating}
-            />
-            <button
-              type="button"
-              className="toggle-visibility-btn"
-              onClick={() => setShowToken(!showToken)}
-              disabled={isValidating}
-            >
-              {showToken ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-          <button 
-            type="submit" 
-            className={`submit-btn ${isValidating ? 'loading' : ''}`}
-            disabled={isValidating}
-          >
-            {isValidating ? 'Validating...' : 'Submit'}
-          </button>
-        </form>
-      ) : (
-        <div className="server-info">
-          <Server size={48} className="server-icon" />
-          <h3 className="server-name">Welcome to {serverInfo.name}!</h3>
-          <p className="server-message">
-            You&apos;re all set to explore MemberSense features. 
-            Use the navigation menu to access Member Showcase and Discord Viewer.
-          </p>
-        </div>
-      )}
-      
-      {validationMessage && (
-        <div className={`validation-message ${validationMessage.type}`}>
-          {validationMessage.type === 'success' ? 
-            <CheckCircle className="message-icon" size={20} /> : 
-            <AlertCircle className="message-icon" size={20} />
-          }
-          {validationMessage.text}
-        </div>
-      )}
-
-      <div className="token-info">
-        <a href="https://github.com/ModelEarth/feed/blob/main/MemberSense.md" target="_blank" rel="noopener noreferrer" className="token-link">
-          How to Get My Team's Token?
-        </a>
-=======
   /**
    * Renders the demo/production mode toggle
    */
@@ -191,7 +128,6 @@ const MemberSense = ({
             ? "Currently using sample data to explore features"
             : "Connected to your Discord server data"}
         </p>
->>>>>>> upstream/main
       </div>
       <button
         onClick={onToggleMockData}

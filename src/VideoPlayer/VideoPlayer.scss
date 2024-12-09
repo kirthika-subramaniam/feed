@@ -111,6 +111,23 @@
     transition: all 0.3s ease;
   }
 
+  &__progress-bg {
+    position: absolute;
+    bottom: 0;
+    z-index: 30;
+    width: 100%;
+    background: #c4c4c4;
+    height: 0.5rem;
+  }
+
+  &__progress {
+    position: absolute;
+    width: 0%;
+    height: 0.5rem;
+    background: linear-gradient(90deg, #ffe600 -50%, #ffcc00 50%); 
+    transition: all 0.5s ease-in-out;
+  }
+
   &__dropdown {
     position: absolute;
     top: 6px;

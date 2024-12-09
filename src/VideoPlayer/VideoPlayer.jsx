@@ -5,11 +5,7 @@ import "./VideoPlayer.scss";
 import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
 
-function VideoPlayer({
-  autoplay = false,
-  isFullScreen,
-  handleFullScreen,
-}) {
+function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context);
   const [isPlaying, setIsPlaying] = useState(autoplay);
   const [currentVolume, setCurrentVolume] = useState(1);
@@ -414,6 +410,17 @@ function VideoPlayer({
             <p>No media available</p>
           </div>
         )}
+        <div className="VideoPlayer__progress-bg">
+          <div
+            className="VideoPlayer__progress"
+            style={{
+              width:
+                selectedMediaList.length > 0
+                  ? `${(currentMediaIndex / selectedMediaList.length) * 100}%`
+                  : "0%",
+            }}
+          ></div>
+        </div>
         {!isLoading && currentMedia && (
           <div className="VideoPlayer__overlay">
             <div className="VideoPlayer__info">
