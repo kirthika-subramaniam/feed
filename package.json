@@ -20,6 +20,7 @@
     "react-to-webcomponent": "^2.0.0",
     "remixicon": "^3.5.0",
     "sass": "^1.65.1",
+    "swiper": "^11.1.14",
     "yarn": "^1.22.22"
   },
   "devDependencies": {

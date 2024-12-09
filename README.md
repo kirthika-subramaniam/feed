@@ -10,7 +10,7 @@ Welcome to our Feed-Player React Project! This project provides a modern and use
 <!-- https://video-player-sahilatahar.netlify.app -->
 
 <!-- [Check out the Live Preview](intro.html) -->
-[Check out the dist preview](dist/) of the Feed-Player project on model.earth.
+[Check out the FeedPlayer](https://model.earth/feed/) on model.earth.
 
 ## Feed Samples
 
@@ -23,33 +23,40 @@ Welcome to our Feed-Player React Project! This project provides a modern and use
 
 Place your name here if you're working on an update.
 
-DONE: Pulled image and video links from a Google Sheet by implementing the Content/ContextGoogle.jsx page which pulls from this [Google Sheet](https://docs.google.com/spreadsheets/d/1jQTlXWom-pXvyP9zuTcbdluyvpb43hu2h7anxhF5qlQ/edit?usp=sharing) - By Gary
+1.) TO DO: We recently deactivated pre-loading other feeds. Get the dropdown choices (in the upper right) to load the selected feeds. Get the "BigBunny" video to load again.  Provide a more specific error than "No media available".
 
+2.) DONE: Pull the image and video links from a Google Sheet by implementing the Content/ContextGoogle.jsx page which pulls from this [Google Sheet](https://docs.google.com/spreadsheets/d/1jQTlXWom-pXvyP9zuTcbdluyvpb43hu2h7anxhF5qlQ/edit?usp=sharing) - By Gary
+
+<!--
 DONE: Add columns for Title and Description in the Google Sheet - Matt B
+-->
 
-1.) DONE: New swiper control and text that scrolls in player.  - Shreyas
+3.) DONE: New swiper control and text that scrolls in player.  - Shreyas
 
-2.) TO DO: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously.
+4.) TO DO: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously.
+
+5.) IN PROGRESS: Membersense development and implementation using Discord API - Yunbo
 
 <!-- 
 Let's revisit this for a modile orienation.
-3.) DONE: Aspect ratio of video remains the same when showing landscape image.--><!--To prevent the video height from jumping short briefly: When setCurrentVideoSrc is called to advance the video, insert the current height until the next video loads. Remove the inserted height once the new slide video/image loads into the DOM. (The last video is an example with a different aspect ratio.)-->
+DONE: Aspect ratio of video remains the same when showing landscape image.--><!--To prevent the video height from jumping short briefly: When setCurrentVideoSrc is called to advance the video, insert the current height until the next video loads. Remove the inserted height once the new slide video/image loads into the DOM. (The last video is an example with a different aspect ratio.)-->
 
-
-6.) TO DO: Use Vite to add [Swiper Element](https://swiperjs.com/element) in our "[swiper](https://github.com/modelearth/swiper)" repo and provide a filmstrip based on the images in incoming feeds. Place in a "swiper" folder. See [Swiper Element Setup](https://www.freecodecamp.org/news/how-to-set-up-swiper-element-in-a-react-application/) and [Film-strip sample](https://www.sliderrevolution.com/templates/wordpress-media-gallery) - We'll avoid showing multiple heros at the same time - Srinath
+6.) IN PROGRESS: Use Vite to add [Swiper Element](https://swiperjs.com/element) in our "[swiper](https://github.com/modelearth/swiper)" repo and provide a filmstrip based on the images in incoming feeds. Place in a "swiper" folder. See [Swiper Element Setup](https://www.freecodecamp.org/news/how-to-set-up-swiper-element-in-a-react-application/) and [Film-strip sample](https://www.sliderrevolution.com/templates/wordpress-media-gallery) - We'll avoid showing multiple heros at the same time - Srinath
 
 7.) TO DO: Load images into the Feed Player from our [pull from Github](../home/repo/). - Chethan
 Embed and show the FeedPlayer when choosing "images" at [/home/repo/](../home/repo/)
 
-8a.) TO DO: Pull NASA feed into React Feed Player and show images. - Noopur : Done
+8.) DONE: Pull NASA feed into React Feed Player and show images. - Noopur
 
-8b.) TO DO: In Javascript feed/view page, pull in multiple Bluesky RSS feed links by passing in a pipe | separated list of feed urls. Add loop when pipes found in the url value in both JQuery feed/view - Noopur : Done
+9.) TO DO: In Javascript feed/view page, pull in multiple Bluesky RSS feed links by passing in a pipe | separated list of feed urls. Add loop when pipes found in the url value in both JQuery feed/view - Noopur : Done
 
-8c.) In React Feed Player, using [Feeds tab CSV pull from Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSxfv7lxikjrmro3EJYGE_134vm5HdDszZKt4uKswHhsNJ_-afSaG9RoA4oeNV656r4mTuG3wTu38pM/pub?gid=889452679&single=true&output=csv), split on the pipe in the React Feed Player. - Noopur
+10.) In React Feed Player, using [Feeds tab CSV pull from Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSxfv7lxikjrmro3EJYGE_134vm5HdDszZKt4uKswHhsNJ_-afSaG9RoA4oeNV656r4mTuG3wTu38pM/pub?gid=889452679&single=true&output=csv), split on the pipe in the React Feed Player. - Noopur
 
-9.) Pull the replies for each Bluesky post in the feed. Use the screen-grab technique that we use to grab images from news sites that are listed in the feed. Scrape the posts from the Bluesky website. Grab replies for the top 3 posts. If the process doesn't work, leave the attempt commented out. - Noopur
+11.) TO DO: Pull the replies for each Bluesky post in the feed. Use the screen-grab technique that we use to grab images from news sites that are listed in the feed. Scrape the posts from the Bluesky website. Grab replies for the top 3 posts. If the process doesn't work, leave the attempt commented out. - Noopur
 
-10.) List of feeds on right of player with links to /feed/view/#feed= - Kalyan
+12.) DONE - List of feeds on right of player with links to /feed/view/#feed= - Kalyan
+
+13.) Hide the "link icon" in the upper right unless a video is being viewed.
 
 ### Building Transparency
 

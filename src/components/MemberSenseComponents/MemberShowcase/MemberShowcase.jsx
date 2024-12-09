@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronLeft, ChevronRight, Mail, ExternalLink } from 'lucide-react';
 import './MemberShowcase.scss';
 
+// Card component to display individual member information
 const MemberCard = ({ member, openProfile }) => (
   <motion.div
     className="member-card"
@@ -25,68 +28,71 @@ const MemberCard = ({ member, openProfile }) => (
 );
 
 const MemberShowcase = ({ members, isFullScreen }) => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [gridDimensions, setGridDimensions] = useState({ columns: 3, rows: 3 });
-  const containerRef = useRef(null);
-  const intervalDuration = 5000; // 5 seconds per page
-  const intervalRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0); // Manages pagination
+  const [progress, setProgress] = useState(0); // Manages auto-progress indicator
+  const [searchTerm, setSearchTerm] = useState(''); // Stores the current search term
+  const [selectedMember, setSelectedMember] = useState(null); // Manages the selected member profile display
+  const [isLoading, setIsLoading] = useState(true); // Indicates loading state for members
+  const [gridDimensions, setGridDimensions] = useState({ columns: 3, rows: 3 }); // Grid dimensions based on screen size
 
+  // References for auto-progress interval and container for calculating dimensions
+  const containerRef = useRef(null);
+  const intervalRef = useRef(null);
+  const intervalDuration = 5000; // Time in ms for auto page change
+
+  // Filters members by search term
   const filteredMembers = members.filter(member =>
     member.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (member.email && member.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Calculates grid layout based on screen size and fullscreen mode
   const calculateGridDimensions = useCallback(() => {
-    if (!isFullScreen) {
-      return { columns: 3, rows: 3 };
-    }
+    if (!isFullScreen) return { columns: 3, rows: 3 };
 
     if (containerRef.current) {
       const { width, height } = containerRef.current.getBoundingClientRect();
-      const cardWidth = 180; // Width of each card
-      const cardHeight = 240; // Height of each card
-      const gap = 16; // Gap between cards
+      const cardWidth = 180;
+      const cardHeight = 240;
+      const gap = 16;
 
       const columns = Math.floor((width + gap) / (cardWidth + gap));
       const rows = Math.floor((height + gap) / (cardHeight + gap));
 
       return {
-        columns: Math.max(columns, isFullScreen ? 4 : 3),
-        rows: Math.max(rows, isFullScreen ? 4 : 3)
+        columns: Math.max(columns, 4),
+        rows: Math.max(rows, 4)
       };
     }
-    return isFullScreen ? { columns: 4, rows: 4 } : { columns: 3, rows: 3 };
+    return { columns: 4, rows: 4 };
   }, [isFullScreen]);
 
+  // Updates grid dimensions on screen resize
   useEffect(() => {
-    const updateGridDimensions = () => {
-      setGridDimensions(calculateGridDimensions());
-    };
+    const updateGridDimensions = () => setGridDimensions(calculateGridDimensions());
 
     updateGridDimensions();
     window.addEventListener('resize', updateGridDimensions);
     return () => window.removeEventListener('resize', updateGridDimensions);
   }, [calculateGridDimensions]);
 
+  // Simulates fetching members with a loading delay
   useEffect(() => {
     const fetchMembers = async () => {
       setIsLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setIsLoading(false);
     };
-
     fetchMembers();
   }, []);
 
+  // Resets pagination on fullscreen mode change
   useEffect(() => {
     setCurrentPage(0);
     setProgress(0);
   }, [isFullScreen]);
 
+  // Manages auto-pagination with interval and resets if loading
   useEffect(() => {
     if (!isLoading) {
       intervalRef.current = setInterval(() => {
@@ -98,25 +104,23 @@ const MemberShowcase = ({ members, isFullScreen }) => {
           return prevProgress + (100 / (intervalDuration / 100));
         });
       }, 100);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [filteredMembers.length, gridDimensions, intervalDuration, isLoading]);
 
+  // Handles search input changes and resets pagination
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
     setCurrentPage(0);
     setProgress(0);
   };
 
+  // Pagination navigation handlers
   const handlePrevious = useCallback(() => {
     setCurrentPage((prevPage) => (prevPage - 1 + Math.ceil(filteredMembers.length / (gridDimensions.columns * gridDimensions.rows))) % Math.ceil(filteredMembers.length / (gridDimensions.columns * gridDimensions.rows)));
     setProgress(0);
@@ -127,19 +131,17 @@ const MemberShowcase = ({ members, isFullScreen }) => {
     setProgress(0);
   }, [filteredMembers.length, gridDimensions]);
 
-  const openProfile = (member) => {
-    setSelectedMember(member);
-  };
+  // Opens and closes member profile
+  const openProfile = (member) => setSelectedMember(member);
+  const closeProfile = () => setSelectedMember(null);
 
-  const closeProfile = () => {
-    setSelectedMember(null);
-  };
-
+  // Determines the members to display on the current page
   const startIndex = currentPage * (gridDimensions.columns * gridDimensions.rows);
   const displayedMembers = filteredMembers.slice(startIndex, startIndex + (gridDimensions.columns * gridDimensions.rows));
 
   return (
     <div className={`member-showcase ${isFullScreen ? 'fullscreen' : ''}`}>
+      {/* Navigation bar with search functionality */}
       <nav className="app-nav">
         <div className="search-container">
           <Search size={20} />
@@ -152,6 +154,8 @@ const MemberShowcase = ({ members, isFullScreen }) => {
           />
         </div>
       </nav>
+
+      {/* Main content area to display member grid or loading spinner */}
       <main className="app-content" ref={containerRef}>
         <AnimatePresence mode="wait">
           {isLoading ? (
@@ -184,6 +188,8 @@ const MemberShowcase = ({ members, isFullScreen }) => {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Pagination controls */}
       <div className="pagination">
         <button onClick={handlePrevious} disabled={currentPage === 0 || isLoading}>
           <ChevronLeft size={16} />
@@ -193,9 +199,13 @@ const MemberShowcase = ({ members, isFullScreen }) => {
           <ChevronRight size={16} />
         </button>
       </div>
+
+      {/* Progress bar for auto-pagination */}
       <div className="progress-bar-container">
         <div className="progress-bar" style={{ width: `${progress}%` }} />
       </div>
+
+      {/* Profile overlay for viewing selected member details */}
       <AnimatePresence>
         {selectedMember && (
           <motion.div 
