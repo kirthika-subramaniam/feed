@@ -43,7 +43,7 @@ DONE: Aspect ratio of video remains the same when showing landscape image.--><!-
 
 6.) IN PROGRESS: Use Vite to add [Swiper Element](https://swiperjs.com/element) in our "[swiper](https://github.com/modelearth/swiper)" repo and provide a filmstrip based on the images in incoming feeds. Place in a "swiper" folder. See [Swiper Element Setup](https://www.freecodecamp.org/news/how-to-set-up-swiper-element-in-a-react-application/) and [Film-strip sample](https://www.sliderrevolution.com/templates/wordpress-media-gallery) - We'll avoid showing multiple heros at the same time - Srinath
 
-7.) TO DO: Load images into the Feed Player from our [pull from Github](../home/repo/). - Chethan
+7.) DONE: Load images into the Feed Player from our [pull from Github](../home/repo/). - Chethan
 Embed and show the FeedPlayer when choosing "images" at [/home/repo/](../home/repo/)
 
 8.) DONE: Pull NASA feed into React Feed Player and show images. - Noopur

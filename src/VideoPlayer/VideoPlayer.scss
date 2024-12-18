@@ -405,3 +405,20 @@
   background-color: #f0f0f0;
   color: #666;
 }
+
+.gallery {
+  align-items: center;
+  width: 100%;
+  // width: min(90vw, 800px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  object-fit: cover;
+  display: flex;
+  background-color: #f0f0f0; 
+  // border-top-left-radius: 20px;
+  // border-top-right-radius: 20px;
+  overflow: hidden;
+}
