@@ -6,75 +6,35 @@ import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
 
 function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
-  const { mediaList, currentMedia, setCurrentMedia } = useContext(Context);
-  const [isPlaying, setIsPlaying] = useState(autoplay);
-  const [currentVolume, setCurrentVolume] = useState(1);
-  const [isMute, setIsMute] = useState(true);
-  const [imageElapsed, setImageElapsed] = useState(0);
-  const containerRef = useRef(null);
-  const videoRef = useRef(null);
-  const videoRangeRef = useRef(null);
-  const volumeRangeRef = useRef(null);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const imageTimerRef = useRef(null);
+  // The numbers here are the states to see in React Developer Tools
+  const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
+  const [isPlaying, setIsPlaying] = useState(autoplay); // 1
+  const [currentVolume, setCurrentVolume] = useState(1); // 2
+  const [isMute, setIsMute] = useState(true); // 3
+  const [imageElapsed, setImageElapsed] = useState(0); // 4
+  const containerRef = useRef(null); // 5
+  const videoRef = useRef(null); // 6
+  const videoRangeRef = useRef(null); // 7
+  const volumeRangeRef = useRef(null); // 8
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0); // 9
+  const imageTimerRef = useRef(null); // 10
 
-  const [duration, setDuration] = useState([0, 0]);
-  const [currentTime, setCurrentTime] = useState([0, 0]);
-  const [durationSec, setDurationSec] = useState(0);
-  const [currentSec, setCurrentTimeSec] = useState(0);
+  const [duration, setDuration] = useState([0, 0]); // 11
+  const [currentTime, setCurrentTime] = useState([0, 0]); // 12
+  const [durationSec, setDurationSec] = useState(0); // 13
+  const [currentSec, setCurrentTimeSec] = useState(0); // 14
 
-  const [isDropdownActive, setIsDropdownActive] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [selectedMediaList, setSelectedMediaList] = useState([]);
-  const [listofMedia, setListofMedia] = useState({});
-  const [loadedFeeds, setLoadedFeeds] = useState([]);
-  const [loadingFeeds, setLoadingFeeds] = useState({});
+  const [isDropdownActive, setIsDropdownActive] = useState(false); // 15
+  const [index, setIndex] = useState(0); // 16
+  const [selectedMediaList, setSelectedMediaList] = useState([]); // 17
+  const [listofMedia, setListofMedia] = useState({}); // 18
+  const [loadedFeeds, setLoadedFeeds] = useState([]); // 19
+  const [loadingFeeds, setLoadingFeeds] = useState({}); // 20
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // 21
+  const [activeFeed, setActiveFeed] = useState("nasa"); // 22
 
   const imageDuration = 4;
-
-  // const [imageFiles, setImageFiles] = useState([]);
-
-  // Function to fetch image files
-  // const loadImageFiles = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //         const owner = "modelearth";
-  //         const repo = "requests";
-  //         const branch = "main";
-
-  //         const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
-  //         console.log("Repo data URL : " + repoFeed.url)
-
-  //         // const response = await axios.get(
-  //         //     `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
-  //         // );
-
-  //         const response = await axios.get(
-  //             `${repoFeed.url}`
-  //         );
-
-  //         const files = response.data.tree.filter((file) =>
-  //             /\.(jpg|jpeg|gif)$/i.test(file.path)
-  //         );
-
-  //         setImageFiles(
-  //             files.map((file) => ({
-  //                 name: file.path,
-  //                 url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
-  //             }))
-  //         );
-  //     } catch (err) {
-  //         console.error("Error fetching image files:", err);
-  //     }
-  // };
-
-  // useEffect(() => {
-  //     if (mediaList && mediaList.length > 0) {
-  //         loadImageFiles();
-  //     }
-  // }, [mediaList]);
 
   useEffect(() => {
     if (mediaList && mediaList.length > 0) {
@@ -126,13 +86,12 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 
   const fetchMediaFromAPI = async (media) => {
     try {
+      setActiveFeed(media.feed.trim().toLowerCase());
       const response = await axios.get(media.url);
       const owner = "modelearth";
       const repo = "requests";
       const branch = "main";
-      const repoFeed = mediaList.find(
-        (media) => media.feed.trim() === "repo"
-      );
+      const repoFeed = mediaList.find((media) => media.feed.trim() === "repo");
       console.log("Repo data URL : " + repoFeed.url);
       const responseRepo = await axios.get(`${repoFeed.url}`);
 
@@ -159,18 +118,6 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
             return photos;
           });
         case "repo":
-
-          // const files = responseRepo.data.tree.filter((file) =>
-          //     /\.(jpg|jpeg|gif)$/i.test(file.path)
-          // );
-
-          // setImageFiles(
-          //     files.map((file) => ({
-          //         name: file.path,
-          //         url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
-          //     }))
-          // );
-
           return responseRepo.data.tree
             .filter((file) => /\.(jpg|jpeg|gif)$/i.test(file.path))
             .map((file) => ({
@@ -178,7 +125,6 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
               text: "No description available",
               title: file.path.split("/").pop(),
             }));
-
         default:
           return response.data.map((item) => ({
             url: item.hdurl || item.url,
@@ -281,7 +227,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
   const handleNext = useCallback(() => {
     setCurrentMediaIndex((prevIndex) => {
       const nextIndex = (prevIndex + 1) % mediaList.length;
-      console.log("Moving to next media. New index:", nextIndex);
+      console.log("Moving to next media. New index: ", nextIndex);
       return nextIndex;
     });
   }, [mediaList.length]);
@@ -289,10 +235,12 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
   const handlePrev = useCallback(() => {
     setCurrentMediaIndex((prevIndex) => {
       const nextIndex = (prevIndex - 1 + mediaList.length) % mediaList.length;
-      console.log("Moving to previous media. New index:", nextIndex);
+      console.log("Moving to previous media. New index: ", nextIndex);
       return nextIndex;
     });
   }, [mediaList.length]);
+
+  const clickToMove = () => {};
 
   const handleVideoRange = () => {
     if (currentMedia && isVideoFile(currentMedia.url) && videoRef.current) {
@@ -350,7 +298,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
         setDurationSec(videoRef.current.duration);
         const { min, sec } = formatTime(videoRef.current.duration);
         setDuration([min, sec]);
-        console.log("Video loaded:", currentMedia.url);
+        console.log("Video loaded: ", currentMedia.url);
       }
     };
 
@@ -381,9 +329,9 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
     if (selectedMediaList.length > 0) {
       setCurrentMedia(selectedMediaList[currentMediaIndex]);
       console.log(
-        "Current media set:",
+        "Current media set: ",
         selectedMediaList[currentMediaIndex],
-        "Index:",
+        "Index: ",
         currentMediaIndex
       );
     }
@@ -399,10 +347,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 
   useEffect(() => {
     console.log(
-      "Current media changed:",
-      currentMedia,
-      "Index:",
-      currentMediaIndex
+      "Current media changed: " + currentMedia + "Index: " + currentMediaIndex
     );
     setCurrentTimeSec(0);
     setCurrentTime([0, 0]);
@@ -487,10 +432,34 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
             style={{
               width:
                 selectedMediaList.length > 0
-                  ? `${(currentMediaIndex / selectedMediaList.length) * 100}%`
+                  ? `${
+                      ((currentMediaIndex + 1) /
+                        (selectedMediaList.length < 7
+                          ? selectedMediaList.length
+                          : 7)) *
+                      100
+                    }%`
                   : "0%",
             }}
           ></div>
+          {selectedMediaList.slice(0, 7).map(
+            (item, index) =>
+              index > 0 && (
+                <div
+                  key={index}
+                  className="VideoPlayer__progress-point"
+                  style={{
+                    left: `${
+                      (index /
+                        (selectedMediaList.length < 7
+                          ? selectedMediaList.length
+                          : 7)) *
+                      100
+                    }%`,
+                  }}
+                ></div>
+              )
+          )}
         </div>
         {!isLoading && currentMedia && (
           <div className="VideoPlayer__overlay">
@@ -608,16 +577,6 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
           </button>
         </div>
       </div>
-      {/* <div className="gallery">
-                {imageFiles.map((file, index) => (
-                    // <div className="thumbnail" key={index}>
-                    <div key={index}>
-                        <a href={file.url} target="_blank" rel="noopener noreferrer">
-                            <img src={file.url} alt={file.name} />
-                        </a>
-                    </div>
-                ))}
-        </div> */}
     </div>
   );
 }
@@ -626,10 +585,6 @@ VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   isFullScreen: PropTypes.bool.isRequired,
   handleFullScreen: PropTypes.func.isRequired,
-};
-
-VideoPlayer.defaultProps = {
-  autoplay: false,
 };
 
 export default VideoPlayer;
