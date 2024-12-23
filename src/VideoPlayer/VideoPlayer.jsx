@@ -5,7 +5,12 @@ import "./VideoPlayer.scss";
 import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
 
-function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
+function VideoPlayer({
+  autoplay = false,
+  isFullScreen,
+  setIsFullScreen,
+  handleFullScreen,
+}) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
   const [isPlaying, setIsPlaying] = useState(autoplay); // 1
@@ -240,7 +245,16 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
     });
   }, [mediaList.length]);
 
-  const clickToMove = () => {};
+  const moveToSlide = useCallback((activeFeed, index) => {
+    setCurrentMediaIndex(() => {
+      console.log("Move to: ", index);
+      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
+      const newHash = `feed=${activeFeed}&scene=${index + 1}`;
+      const newURL = `${currentURL}#${newHash}`; // Append the new hash to the URL
+      window.history.replaceState(null, "", newURL);
+      return index;
+    });
+  }, []);
 
   const handleVideoRange = () => {
     if (currentMedia && isVideoFile(currentMedia.url) && videoRef.current) {
@@ -389,7 +403,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
         handleFullScreenChange
       );
     };
-  }, []);
+  }, [setIsFullScreen]);
 
   return (
     <div
@@ -444,19 +458,21 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
           ></div>
           {selectedMediaList.slice(0, 7).map(
             (item, index) =>
-              index > 0 && (
+              index >= 0 && (
                 <div
                   key={index}
                   className="VideoPlayer__progress-point"
                   style={{
                     left: `${
-                      (index /
+                      ((index + 1) /
                         (selectedMediaList.length < 7
                           ? selectedMediaList.length
                           : 7)) *
-                      100
+                      99.75
                     }%`,
                   }}
+                  title={`Move to slide ${index + 1}`}
+                  onClick={() => moveToSlide(activeFeed, index)}
                 ></div>
               )
           )}
@@ -584,6 +600,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, handleFullScreen }) {
 VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   isFullScreen: PropTypes.bool.isRequired,
+  setIsFullScreen: PropTypes.bool,
   handleFullScreen: PropTypes.func.isRequired,
 };
 
