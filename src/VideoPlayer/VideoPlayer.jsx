@@ -44,13 +44,14 @@ function VideoPlayer({
   };
 
   const parseHash = () => {
-    const hash = window.location.hash.substring(1);
+    const hash = window.location.hash.substring(1); // Remove the leading '#'
     const params = new URLSearchParams(hash);
     return {
-      feed: params.get("feed"),
-      ref: parseInt(params.get("ref"), 10),
+      feed: params.get("feed") || "",
+      ref: parseInt(params.get("ref"), 10) || 0, // Default to 0 if ref is not valid
     };
   };
+  
   
 
   useEffect(() => {
@@ -58,6 +59,21 @@ function VideoPlayer({
       updateURLHash(mediaList[index].feed, currentMediaIndex);
     }
   }, [currentMediaIndex, currentMedia, mediaList, index]);
+
+  useEffect(() => {
+    const { feed } = parseHash();
+  
+    if (feed) {
+      const selectedFeed = mediaList.find(
+        (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
+      );
+  
+      if (selectedFeed) {
+        setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
+      }
+    }
+  }, [mediaList]);
+  
 
   useEffect(() => {
     const { feed, ref } = parseHash();
@@ -85,24 +101,40 @@ function VideoPlayer({
     const handleHashChange = () => {
       const { feed, ref } = parseHash();
   
-      if (feed && ref >= 0) {
+      if (feed) {
         // Find the feed in mediaList
         const selectedFeed = mediaList.find(
           (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
         );
   
-        if (selectedFeed && listofMedia[selectedFeed.title]) {
-          const selectedMedia = listofMedia[selectedFeed.title];
-          if (selectedMedia[ref]) {
-            setIndex(mediaList.indexOf(selectedFeed));
-            setSelectedMediaList(selectedMedia);
-            setCurrentMedia(selectedMedia[ref]);
-            setCurrentMediaIndex(ref);
+        if (selectedFeed) {
+          // If the feed is not loaded, load it
+          if (!listofMedia[selectedFeed.title]) {
+            loadFeed(selectedFeed, listofMedia).then(() => {
+              const selectedMedia = listofMedia[selectedFeed.title];
+              if (selectedMedia && ref >= 0 && selectedMedia[ref]) {
+                setIndex(mediaList.indexOf(selectedFeed));
+                setSelectedMediaList(selectedMedia);
+                setCurrentMedia(selectedMedia[ref]);
+                setCurrentMediaIndex(ref);
+              } else {
+                console.warn("Invalid ref index in URL hash for the selected feed");
+              }
+            });
           } else {
-            console.warn("Invalid ref index in URL hash");
+            // Feed is already loaded
+            const selectedMedia = listofMedia[selectedFeed.title];
+            if (selectedMedia && ref >= 0 && selectedMedia[ref]) {
+              setIndex(mediaList.indexOf(selectedFeed));
+              setSelectedMediaList(selectedMedia);
+              setCurrentMedia(selectedMedia[ref]);
+              setCurrentMediaIndex(ref);
+            } else {
+              console.warn("Invalid ref index in URL hash for the selected feed");
+            }
           }
         } else {
-          console.warn("Feed not found in mediaList or listofMedia");
+          console.warn("Feed not found in mediaList");
         }
       }
     };
@@ -117,6 +149,7 @@ function VideoPlayer({
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [mediaList, listofMedia]);
+  
   
 
 
