@@ -43,11 +43,81 @@ function VideoPlayer({
     window.location.hash = hash;
   };
 
+  const parseHash = () => {
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    return {
+      feed: params.get("feed"),
+      ref: parseInt(params.get("ref"), 10),
+    };
+  };
+  
+
   useEffect(() => {
     if (currentMedia && selectedMediaList.length > 0) {
       updateURLHash(mediaList[index].feed, currentMediaIndex);
     }
   }, [currentMediaIndex, currentMedia, mediaList, index]);
+
+  useEffect(() => {
+    const { feed, ref } = parseHash();
+  
+    if (feed && ref >= 0) {
+      const selectedFeed = mediaList.find(
+        (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
+      );
+  
+      if (selectedFeed) {
+        loadFeed(selectedFeed, listofMedia).then(() => {
+          const selectedMedia = listofMedia[selectedFeed.title];
+          if (selectedMedia[ref]) {
+            setIndex(mediaList.indexOf(selectedFeed));
+            setSelectedMediaList(selectedMedia);
+            setCurrentMedia(selectedMedia[ref]);
+            setCurrentMediaIndex(ref);
+          }
+        });
+      }
+    }
+  }, [mediaList]);  
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { feed, ref } = parseHash();
+  
+      if (feed && ref >= 0) {
+        // Find the feed in mediaList
+        const selectedFeed = mediaList.find(
+          (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
+        );
+  
+        if (selectedFeed && listofMedia[selectedFeed.title]) {
+          const selectedMedia = listofMedia[selectedFeed.title];
+          if (selectedMedia[ref]) {
+            setIndex(mediaList.indexOf(selectedFeed));
+            setSelectedMediaList(selectedMedia);
+            setCurrentMedia(selectedMedia[ref]);
+            setCurrentMediaIndex(ref);
+          } else {
+            console.warn("Invalid ref index in URL hash");
+          }
+        } else {
+          console.warn("Feed not found in mediaList or listofMedia");
+        }
+      }
+    };
+  
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+  
+    // Trigger on component mount
+    handleHashChange();
+  
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [mediaList, listofMedia]);
+  
 
 
   // const [imageFiles, setImageFiles] = useState([]);
@@ -257,7 +327,7 @@ function VideoPlayer({
       }
     }
   };
-  
+
 
   const pause = () => {
     console.log("Pause function called");
