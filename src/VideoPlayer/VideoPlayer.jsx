@@ -38,6 +38,18 @@ function VideoPlayer({
 
   const imageDuration = 4;
 
+  const updateURLHash = (feed, ref) => {
+    const hash = `#feed=${encodeURIComponent(feed)}&ref=${ref}`;
+    window.location.hash = hash;
+  };
+
+  useEffect(() => {
+    if (currentMedia && selectedMediaList.length > 0) {
+      updateURLHash(mediaList[index].feed, currentMediaIndex);
+    }
+  }, [currentMediaIndex, currentMedia, mediaList, index]);
+
+
   // const [imageFiles, setImageFiles] = useState([]);
 
   // Function to fetch image files
@@ -507,7 +519,7 @@ function VideoPlayer({
             </span>
             <div className="VideoPlayer__caret"></div>
           </div>
-          <ul
+          {/* <ul
             className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}
           >
             {mediaList &&
@@ -537,7 +549,39 @@ function VideoPlayer({
                     " (Click to load)"}
                 </li>
               ))}
+          </ul> */}
+          <ul className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}>
+            {mediaList &&
+              mediaList.map((media, idx) => (
+                <li
+                  key={idx}
+                  className={`${currentMediaIndex === idx ? "active" : ""} ${loadedFeeds.includes(media.feed.trim().toLowerCase()) ? "" : "loading"
+                    }`}
+                  onClick={() => {
+                    if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
+                      setIndex(idx);
+                      setIsDropdownActive(false);
+                      setCurrentMediaIndex(0);
+                      setSelectedMediaList(listofMedia[media.title]);
+                      setCurrentMedia(listofMedia[media.title][0]);
+                      updateURLHash(media.feed, 0); // Update hash
+                    } else {
+                      loadFeed(media, listofMedia).then(() => {
+                        setIndex(idx);
+                        setIsDropdownActive(false);
+                        setCurrentMediaIndex(0);
+                        setSelectedMediaList(listofMedia[media.title]);
+                        setCurrentMedia(listofMedia[media.title][0]);
+                        updateURLHash(media.feed, 0); // Update hash after loading
+                      });
+                    }
+                  }}
+                >
+                  {media.title || media.feed}
+                </li>
+              ))}
           </ul>
+
         </div>
       </div>
       <div className="VideoPlayer__controls">
