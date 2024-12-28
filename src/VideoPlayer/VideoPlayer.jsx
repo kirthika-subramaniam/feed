@@ -257,6 +257,7 @@ function VideoPlayer({
       }
     }
   };
+  
 
   const pause = () => {
     console.log("Pause function called");
