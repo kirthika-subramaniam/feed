@@ -38,6 +38,121 @@ function VideoPlayer({
 
   const imageDuration = 4;
 
+  const updateURLHash = (feed, ref) => {
+    const hash = `#feed=${encodeURIComponent(feed)}&ref=${ref}`;
+    window.location.hash = hash;
+  };
+
+  const parseHash = () => {
+    const hash = window.location.hash.substring(1); // Remove the leading '#'
+    const params = new URLSearchParams(hash);
+    return {
+      feed: params.get("feed") || "",
+      ref: parseInt(params.get("ref"), 10) || 0, // Default to 0 if ref is not valid
+    };
+  };
+  
+  
+
+  useEffect(() => {
+    if (currentMedia && selectedMediaList.length > 0) {
+      updateURLHash(mediaList[index].feed, currentMediaIndex);
+    }
+  }, [currentMediaIndex, currentMedia, mediaList, index]);
+
+  useEffect(() => {
+    const { feed } = parseHash();
+  
+    if (feed) {
+      const selectedFeed = mediaList.find(
+        (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
+      );
+  
+      if (selectedFeed) {
+        setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
+      }
+    }
+  }, [mediaList]);
+  
+
+  useEffect(() => {
+    const { feed, ref } = parseHash();
+  
+    if (feed && ref >= 0) {
+      const selectedFeed = mediaList.find(
+        (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
+      );
+  
+      if (selectedFeed) {
+        loadFeed(selectedFeed, listofMedia).then(() => {
+          const selectedMedia = listofMedia[selectedFeed.title];
+          if (selectedMedia[ref]) {
+            setIndex(mediaList.indexOf(selectedFeed));
+            setSelectedMediaList(selectedMedia);
+            setCurrentMedia(selectedMedia[ref]);
+            setCurrentMediaIndex(ref);
+          }
+        });
+      }
+    }
+  }, [mediaList]);  
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const { feed, ref } = parseHash();
+  
+      if (feed) {
+        // Find the feed in mediaList
+        const selectedFeed = mediaList.find(
+          (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
+        );
+  
+        if (selectedFeed) {
+          // If the feed is not loaded, load it
+          if (!listofMedia[selectedFeed.title]) {
+            loadFeed(selectedFeed, listofMedia).then(() => {
+              const selectedMedia = listofMedia[selectedFeed.title];
+              if (selectedMedia && ref >= 0 && selectedMedia[ref]) {
+                setIndex(mediaList.indexOf(selectedFeed));
+                setSelectedMediaList(selectedMedia);
+                setCurrentMedia(selectedMedia[ref]);
+                setCurrentMediaIndex(ref);
+              } else {
+                console.warn("Invalid ref index in URL hash for the selected feed");
+              }
+            });
+          } else {
+            // Feed is already loaded
+            const selectedMedia = listofMedia[selectedFeed.title];
+            if (selectedMedia && ref >= 0 && selectedMedia[ref]) {
+              setIndex(mediaList.indexOf(selectedFeed));
+              setSelectedMediaList(selectedMedia);
+              setCurrentMedia(selectedMedia[ref]);
+              setCurrentMediaIndex(ref);
+            } else {
+              console.warn("Invalid ref index in URL hash for the selected feed");
+            }
+          }
+        } else {
+          console.warn("Feed not found in mediaList");
+        }
+      }
+    };
+  
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+  
+    // Trigger on component mount
+    handleHashChange();
+  
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [mediaList, listofMedia]);
+  
+  
+
+
   // const [imageFiles, setImageFiles] = useState([]);
 
   // Function to fetch image files
@@ -245,6 +360,7 @@ function VideoPlayer({
       }
     }
   };
+
 
   const pause = () => {
     console.log("Pause function called");
@@ -507,7 +623,7 @@ function VideoPlayer({
             </span>
             <div className="VideoPlayer__caret"></div>
           </div>
-          <ul
+          {/* <ul
             className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}
           >
             {mediaList &&
@@ -537,7 +653,39 @@ function VideoPlayer({
                     " (Click to load)"}
                 </li>
               ))}
+          </ul> */}
+          <ul className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}>
+            {mediaList &&
+              mediaList.map((media, idx) => (
+                <li
+                  key={idx}
+                  className={`${currentMediaIndex === idx ? "active" : ""} ${loadedFeeds.includes(media.feed.trim().toLowerCase()) ? "" : "loading"
+                    }`}
+                  onClick={() => {
+                    if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
+                      setIndex(idx);
+                      setIsDropdownActive(false);
+                      setCurrentMediaIndex(0);
+                      setSelectedMediaList(listofMedia[media.title]);
+                      setCurrentMedia(listofMedia[media.title][0]);
+                      updateURLHash(media.feed, 0); // Update hash
+                    } else {
+                      loadFeed(media, listofMedia).then(() => {
+                        setIndex(idx);
+                        setIsDropdownActive(false);
+                        setCurrentMediaIndex(0);
+                        setSelectedMediaList(listofMedia[media.title]);
+                        setCurrentMedia(listofMedia[media.title][0]);
+                        updateURLHash(media.feed, 0); // Update hash after loading
+                      });
+                    }
+                  }}
+                >
+                  {media.title || media.feed}
+                </li>
+              ))}
           </ul>
+
         </div>
       </div>
       <div className="VideoPlayer__controls">
