@@ -245,6 +245,21 @@ function VideoPlayer({
     });
   }, [mediaList.length]);
 
+  const handleProgressBarClick = (event) => {
+    const progressBar = event.currentTarget; // The clicked progress bar element
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left; // Click position relative to the progress bar
+    const progressWidth = rect.width;
+
+    const clickRatio = clickX / progressWidth; // Ratio of click position to the total width
+    const totalSlides =
+      selectedMediaList.length < 7 ? selectedMediaList.length : 7;
+    const targetSlide = Math.floor(clickRatio * totalSlides);
+
+    console.log(`Navigating to slide: ${targetSlide}`);
+    moveToSlide(activeFeed, targetSlide);
+  };
+
   const moveToSlide = useCallback((activeFeed, index) => {
     setCurrentMediaIndex(() => {
       console.log("Move to: ", index);
@@ -352,6 +367,16 @@ function VideoPlayer({
   }, [currentMediaIndex, mediaList, setCurrentMedia]);
 
   useEffect(() => {
+    const removeHashOnRefresh = () => {
+      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
+      window.history.replaceState(null, "", currentURL); // Update the URL without the hash
+    };
+    window.addEventListener("beforeunload", removeHashOnRefresh);
+    return () =>
+      window.removeEventListener("beforeunload", removeHashOnRefresh);
+  }, []);
+
+  useEffect(() => {
     if (selectedMediaList.length > 0 && !currentMedia) {
       setCurrentMediaIndex(0);
       setCurrentMedia(selectedMediaList[0]);
@@ -440,7 +465,11 @@ function VideoPlayer({
             <p>No media available</p>
           </div>
         )}
-        <div className="VideoPlayer__progress-bg">
+        <div
+          className="VideoPlayer__progress-bg"
+          onClick={(event) => handleProgressBarClick(event)}
+          style={{bottom: isFullScreen ? "12px": 0}}
+        >
           <div
             className="VideoPlayer__progress"
             style={{
@@ -472,7 +501,10 @@ function VideoPlayer({
                     }%`,
                   }}
                   title={`Move to slide ${index + 1}`}
-                  onClick={() => moveToSlide(activeFeed, index)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent the progress bar click handler from triggering
+                    moveToSlide(activeFeed, index);
+                  }}
                 ></div>
               )
           )}

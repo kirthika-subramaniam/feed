@@ -113,7 +113,6 @@
 
   &__progress-bg {
     position: absolute;
-    bottom: 0;
     z-index: 1;
     width: 100%;
     background: #c4c4c4;
@@ -131,7 +130,7 @@
   }
 
   &__progress {
-    position: absolute;
+    // position: absolute;
     width: 0%;
     height: 0.5rem;
     background: linear-gradient(90deg, #ffe600 -50%, #ffcc00 50%); 
@@ -150,7 +149,7 @@
     border: 2px solid #ffcc00;
     border-radius: 50%;
     cursor: pointer;
-    // transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+    transition: transform 0.1s ease, width 0.1s ease, height 0.1s ease;
 
     &:hover {
       transform: translateX(-50%) scale(1.2); // Scales the point
