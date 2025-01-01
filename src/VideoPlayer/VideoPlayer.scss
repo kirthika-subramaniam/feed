@@ -111,6 +111,54 @@
     transition: all 0.3s ease;
   }
 
+  &__progress-bg {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    background: #c4c4c4;
+    height: 0.5rem;
+    cursor: pointer;
+    transition: height 0.3s ease-in-out; 
+
+    &:hover {
+      height: 0.7rem;
+
+      .VideoPlayer__progress {
+        height: 0.7rem;
+      }
+    }
+  }
+
+  &__progress {
+    // position: absolute;
+    width: 0%;
+    height: 0.5rem;
+    background: linear-gradient(90deg, #ffe600 -50%, #ffcc00 50%); 
+    transition: all 0.5s ease-in-out;
+    cursor: pointer;
+    transition: height 0.3s ease-in-out;
+  }
+
+  &__progress-point {
+    position: absolute;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 0.5rem;
+    height: 0.9rem;
+    background: #ffffff;
+    border: 2px solid #ffcc00;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s ease, width 0.1s ease, height 0.1s ease;
+
+    &:hover {
+      transform: translateX(-50%) scale(1.2); // Scales the point
+      width: 0.6rem; // Optional: Directly adjust dimensions
+      height: 1.1rem;
+      width: 0.8rem;
+    }
+  }
+
   &__dropdown {
     position: absolute;
     top: 6px;

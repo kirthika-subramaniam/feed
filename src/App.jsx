@@ -280,6 +280,7 @@ function App() {
             <VideoPlayer
               autoplay={true}
               isFullScreen={isFullScreen}
+              setIsFullScreen={setIsFullScreen}
               handleFullScreen={handleFullScreen}
             />
           </div>

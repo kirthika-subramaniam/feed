@@ -8,33 +8,36 @@ import PropTypes from "prop-types";
 function VideoPlayer({
   autoplay = false,
   isFullScreen,
+  setIsFullScreen,
   handleFullScreen,
 }) {
-  const { mediaList, currentMedia, setCurrentMedia } = useContext(Context);
-  const [isPlaying, setIsPlaying] = useState(autoplay);
-  const [currentVolume, setCurrentVolume] = useState(1);
-  const [isMute, setIsMute] = useState(true);
-  const [imageElapsed, setImageElapsed] = useState(0);
-  const containerRef = useRef(null);
-  const videoRef = useRef(null);
-  const videoRangeRef = useRef(null);
-  const volumeRangeRef = useRef(null);
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const imageTimerRef = useRef(null);
+  // The numbers here are the states to see in React Developer Tools
+  const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
+  const [isPlaying, setIsPlaying] = useState(autoplay); // 1
+  const [currentVolume, setCurrentVolume] = useState(1); // 2
+  const [isMute, setIsMute] = useState(true); // 3
+  const [imageElapsed, setImageElapsed] = useState(0); // 4
+  const containerRef = useRef(null); // 5
+  const videoRef = useRef(null); // 6
+  const videoRangeRef = useRef(null); // 7
+  const volumeRangeRef = useRef(null); // 8
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0); // 9
+  const imageTimerRef = useRef(null); // 10
 
-  const [duration, setDuration] = useState([0, 0]);
-  const [currentTime, setCurrentTime] = useState([0, 0]);
-  const [durationSec, setDurationSec] = useState(0);
-  const [currentSec, setCurrentTimeSec] = useState(0);
+  const [duration, setDuration] = useState([0, 0]); // 11
+  const [currentTime, setCurrentTime] = useState([0, 0]); // 12
+  const [durationSec, setDurationSec] = useState(0); // 13
+  const [currentSec, setCurrentTimeSec] = useState(0); // 14
 
-  const [isDropdownActive, setIsDropdownActive] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [selectedMediaList, setSelectedMediaList] = useState([]);
-  const [listofMedia, setListofMedia] = useState({});
-  const [loadedFeeds, setLoadedFeeds] = useState([]);
-  const [loadingFeeds, setLoadingFeeds] = useState({});
+  const [isDropdownActive, setIsDropdownActive] = useState(false); // 15
+  const [index, setIndex] = useState(0); // 16
+  const [selectedMediaList, setSelectedMediaList] = useState([]); // 17
+  const [listofMedia, setListofMedia] = useState({}); // 18
+  const [loadedFeeds, setLoadedFeeds] = useState([]); // 19
+  const [loadingFeeds, setLoadingFeeds] = useState({}); // 20
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // 21
+  const [activeFeed, setActiveFeed] = useState("nasa"); // 22
 
   const imageDuration = 4;
 
@@ -51,38 +54,31 @@ function VideoPlayer({
       ref: parseInt(params.get("ref"), 10) || 0, // Default to 0 if ref is not valid
     };
   };
-  
-  
 
   useEffect(() => {
-    if (currentMedia && selectedMediaList.length > 0) {
+    if (currentMedia && selectedMediaList.length > 0)
       updateURLHash(mediaList[index].feed, currentMediaIndex);
-    }
   }, [currentMediaIndex, currentMedia, mediaList, index]);
 
   useEffect(() => {
     const { feed } = parseHash();
-  
+
     if (feed) {
       const selectedFeed = mediaList.find(
         (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
       );
-  
-      if (selectedFeed) {
-        setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
-      }
+      if (selectedFeed) setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
     }
   }, [mediaList]);
-  
 
   useEffect(() => {
     const { feed, ref } = parseHash();
-  
+
     if (feed && ref >= 0) {
       const selectedFeed = mediaList.find(
         (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
       );
-  
+
       if (selectedFeed) {
         loadFeed(selectedFeed, listofMedia).then(() => {
           const selectedMedia = listofMedia[selectedFeed.title];
@@ -95,18 +91,18 @@ function VideoPlayer({
         });
       }
     }
-  }, [mediaList]);  
+  }, [mediaList]);
 
   useEffect(() => {
     const handleHashChange = () => {
       const { feed, ref } = parseHash();
-  
+
       if (feed) {
         // Find the feed in mediaList
         const selectedFeed = mediaList.find(
           (media) => media.feed.trim().toLowerCase() === feed.toLowerCase()
         );
-  
+
         if (selectedFeed) {
           // If the feed is not loaded, load it
           if (!listofMedia[selectedFeed.title]) {
@@ -118,7 +114,9 @@ function VideoPlayer({
                 setCurrentMedia(selectedMedia[ref]);
                 setCurrentMediaIndex(ref);
               } else {
-                console.warn("Invalid ref index in URL hash for the selected feed");
+                console.warn(
+                  "Invalid ref index in URL hash for the selected feed"
+                );
               }
             });
           } else {
@@ -130,7 +128,9 @@ function VideoPlayer({
               setCurrentMedia(selectedMedia[ref]);
               setCurrentMediaIndex(ref);
             } else {
-              console.warn("Invalid ref index in URL hash for the selected feed");
+              console.warn(
+                "Invalid ref index in URL hash for the selected feed"
+              );
             }
           }
         } else {
@@ -138,20 +138,14 @@ function VideoPlayer({
         }
       }
     };
-  
     // Listen for hash changes
     window.addEventListener("hashchange", handleHashChange);
-  
     // Trigger on component mount
     handleHashChange();
-  
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [mediaList, listofMedia]);
-  
-  
-
 
   // const [imageFiles, setImageFiles] = useState([]);
 
@@ -245,7 +239,14 @@ function VideoPlayer({
 
   const fetchMediaFromAPI = async (media) => {
     try {
+      setActiveFeed(media.feed.trim().toLowerCase());
       const response = await axios.get(media.url);
+      const owner = "modelearth";
+      const repo = "requests";
+      const branch = "main";
+      const repoFeed = mediaList.find((media) => media.feed.trim() === "repo");
+      console.log("Repo data URL : " + repoFeed.url);
+      const responseRepo = await axios.get(`${repoFeed.url}`);
 
       switch (media.feed.trim().toLowerCase()) {
         case "seeclickfix-311":
@@ -270,36 +271,13 @@ function VideoPlayer({
             return photos;
           });
         case "repo":
-          const owner = "modelearth";
-          const repo = "requests";
-          const branch = "main";
-
-          const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
-          console.log("Repo data URL : " + repoFeed.url)
-
-          const responseRepo = await axios.get(
-            `${repoFeed.url}`
-          );
-
-          // const files = responseRepo.data.tree.filter((file) =>
-          //     /\.(jpg|jpeg|gif)$/i.test(file.path)
-          // );
-
-          // setImageFiles(
-          //     files.map((file) => ({
-          //         name: file.path,
-          //         url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
-          //     }))
-          // );
-
           return responseRepo.data.tree
-            .filter(file => /\.(jpg|jpeg|gif)$/i.test(file.path))
-            .map(file => ({
+            .filter((file) => /\.(jpg|jpeg|gif)$/i.test(file.path))
+            .map((file) => ({
               url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
               text: "No description available",
               title: file.path.split("/").pop(),
             }));
-
         default:
           return response.data.map((item) => ({
             url: item.hdurl || item.url,
@@ -361,7 +339,6 @@ function VideoPlayer({
     }
   };
 
-
   const pause = () => {
     console.log("Pause function called");
     if (currentMedia) {
@@ -403,7 +380,7 @@ function VideoPlayer({
   const handleNext = useCallback(() => {
     setCurrentMediaIndex((prevIndex) => {
       const nextIndex = (prevIndex + 1) % mediaList.length;
-      console.log("Moving to next media. New index:", nextIndex);
+      console.log("Moving to next media. New index: ", nextIndex);
       return nextIndex;
     });
   }, [mediaList.length]);
@@ -411,10 +388,36 @@ function VideoPlayer({
   const handlePrev = useCallback(() => {
     setCurrentMediaIndex((prevIndex) => {
       const nextIndex = (prevIndex - 1 + mediaList.length) % mediaList.length;
-      console.log("Moving to previous media. New index:", nextIndex);
+      console.log("Moving to previous media. New index: ", nextIndex);
       return nextIndex;
     });
   }, [mediaList.length]);
+
+  const handleProgressBarClick = (event) => {
+    const progressBar = event.currentTarget; // The clicked progress bar element
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left; // Click position relative to the progress bar
+    const progressWidth = rect.width;
+
+    const clickRatio = clickX / progressWidth; // Ratio of click position to the total width
+    const totalSlides =
+      selectedMediaList.length < 7 ? selectedMediaList.length : 7;
+    const targetSlide = Math.floor(clickRatio * totalSlides);
+
+    console.log(`Navigating to slide: ${targetSlide}`);
+    moveToSlide(activeFeed, targetSlide);
+  };
+
+  const moveToSlide = useCallback((activeFeed, index) => {
+    setCurrentMediaIndex(() => {
+      console.log("Move to: ", index);
+      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
+      const newHash = `feed=${activeFeed}&scene=${index + 1}`;
+      const newURL = `${currentURL}#${newHash}`; // Append the new hash to the URL
+      window.history.replaceState(null, "", newURL);
+      return index;
+    });
+  }, []);
 
   const handleVideoRange = () => {
     if (currentMedia && isVideoFile(currentMedia.url) && videoRef.current) {
@@ -472,7 +475,7 @@ function VideoPlayer({
         setDurationSec(videoRef.current.duration);
         const { min, sec } = formatTime(videoRef.current.duration);
         setDuration([min, sec]);
-        console.log("Video loaded:", currentMedia.url);
+        console.log("Video loaded: ", currentMedia.url);
       }
     };
 
@@ -503,13 +506,23 @@ function VideoPlayer({
     if (selectedMediaList.length > 0) {
       setCurrentMedia(selectedMediaList[currentMediaIndex]);
       console.log(
-        "Current media set:",
+        "Current media set: ",
         selectedMediaList[currentMediaIndex],
-        "Index:",
+        "Index: ",
         currentMediaIndex
       );
     }
   }, [currentMediaIndex, mediaList, setCurrentMedia]);
+
+  useEffect(() => {
+    const removeHashOnRefresh = () => {
+      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
+      window.history.replaceState(null, "", currentURL); // Update the URL without the hash
+    };
+    window.addEventListener("beforeunload", removeHashOnRefresh);
+    return () =>
+      window.removeEventListener("beforeunload", removeHashOnRefresh);
+  }, []);
 
   useEffect(() => {
     if (selectedMediaList.length > 0 && !currentMedia) {
@@ -521,10 +534,7 @@ function VideoPlayer({
 
   useEffect(() => {
     console.log(
-      "Current media changed:",
-      currentMedia,
-      "Index:",
-      currentMediaIndex
+      "Current media changed: " + currentMedia + "Index: " + currentMediaIndex
     );
     setCurrentTimeSec(0);
     setCurrentTime([0, 0]);
@@ -540,9 +550,9 @@ function VideoPlayer({
     const handleFullScreenChange = () => {
       setIsFullScreen(
         document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement
       );
     };
 
@@ -566,7 +576,7 @@ function VideoPlayer({
         handleFullScreenChange
       );
     };
-  }, []);
+  }, [setIsFullScreen]);
 
   return (
     <div
@@ -603,6 +613,50 @@ function VideoPlayer({
             <p>No media available</p>
           </div>
         )}
+        <div
+          className="VideoPlayer__progress-bg"
+          onClick={(event) => handleProgressBarClick(event)}
+          style={{ bottom: isFullScreen ? "12px" : 0 }}
+        >
+          <div
+            className="VideoPlayer__progress"
+            style={{
+              width:
+                selectedMediaList.length > 0
+                  ? `${
+                      ((currentMediaIndex + 1) /
+                        (selectedMediaList.length < 7
+                          ? selectedMediaList.length
+                          : 7)) *
+                      100
+                    }%`
+                  : "0%",
+            }}
+          ></div>
+          {selectedMediaList.slice(0, 7).map(
+            (item, index) =>
+              index >= 0 && (
+                <div
+                  key={index}
+                  className="VideoPlayer__progress-point"
+                  style={{
+                    left: `${
+                      ((index + 1) /
+                        (selectedMediaList.length < 7
+                          ? selectedMediaList.length
+                          : 7)) *
+                      99.75
+                    }%`,
+                  }}
+                  title={`Move to slide ${index + 1}`}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent the progress bar click handler from triggering
+                    moveToSlide(activeFeed, index);
+                  }}
+                ></div>
+              )
+          )}
+        </div>
         {!isLoading && currentMedia && (
           <div className="VideoPlayer__overlay">
             <div className="VideoPlayer__info">
@@ -630,10 +684,11 @@ function VideoPlayer({
               mediaList.map((media, idx) => (
                 <li
                   key={idx}
-                  className={`${currentMediaIndex === idx ? "active" : ""} ${loadedFeeds.includes(media.feed.trim().toLowerCase())
+                  className={`${currentMediaIndex === idx ? "active" : ""} ${
+                    loadedFeeds.includes(media.feed.trim().toLowerCase())
                       ? ""
                       : "loading"
-                    }`}
+                  }`}
                   onClick={() => {
                     if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
                       setIndex(idx);
@@ -650,17 +705,22 @@ function VideoPlayer({
                   {loadingFeeds[media.title]
                     ? " (Loading...)"
                     : !loadedFeeds.includes(media.feed.trim().toLowerCase()) &&
-                    " (Click to load)"}
+                      " (Click to load)"}
                 </li>
               ))}
           </ul> */}
-          <ul className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}>
+          <ul
+            className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}
+          >
             {mediaList &&
               mediaList.map((media, idx) => (
                 <li
                   key={idx}
-                  className={`${currentMediaIndex === idx ? "active" : ""} ${loadedFeeds.includes(media.feed.trim().toLowerCase()) ? "" : "loading"
-                    }`}
+                  className={`${currentMediaIndex === idx ? "active" : ""} ${
+                    loadedFeeds.includes(media.feed.trim().toLowerCase())
+                      ? ""
+                      : "loading"
+                  }`}
                   onClick={() => {
                     if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
                       setIndex(idx);
@@ -685,7 +745,6 @@ function VideoPlayer({
                 </li>
               ))}
           </ul>
-
         </div>
       </div>
       <div className="VideoPlayer__controls">
@@ -743,22 +802,13 @@ function VideoPlayer({
             onClick={toggleFullScreen}
           >
             <i
-              className={`ri-${isFullScreen ? "fullscreen-exit" : "fullscreen"
-                }-line`}
+              className={`ri-${
+                isFullScreen ? "fullscreen-exit" : "fullscreen"
+              }-line`}
             ></i>
           </button>
         </div>
       </div>
-      {/* <div className="gallery">
-                {imageFiles.map((file, index) => (
-                    // <div className="thumbnail" key={index}>
-                    <div key={index}>
-                        <a href={file.url} target="_blank" rel="noopener noreferrer">
-                            <img src={file.url} alt={file.name} />
-                        </a>
-                    </div>
-                ))}
-        </div> */}
     </div>
   );
 }
@@ -766,11 +816,8 @@ function VideoPlayer({
 VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   isFullScreen: PropTypes.bool.isRequired,
+  setIsFullScreen: PropTypes.bool,
   handleFullScreen: PropTypes.func.isRequired,
-};
-
-VideoPlayer.defaultProps = {
-  autoplay: false,
 };
 
 export default VideoPlayer;

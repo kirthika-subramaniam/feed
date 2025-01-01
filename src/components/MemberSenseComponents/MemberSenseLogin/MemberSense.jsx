@@ -201,7 +201,7 @@ const MemberSense = ({
       )}
       <h3 className="server-name">Welcome to {serverInfo.serverName}!</h3>
       <p className="server-message">
-        You're all set to explore MemberSense features. Use the navigation menu
+        You&apos;re all set to explore MemberSense features. Use the navigation menu
         to access Member Showcase and Discord Viewer.
       </p>
       <div className="server-details">
@@ -256,7 +256,7 @@ const MemberSense = ({
                     rel="noopener noreferrer"
                     className="token-link"
                   >
-                    How to Get My Team's Token?
+                    How to Get My Team&apos;s Token?
                   </a>
                 </div>
                 <div className="permissions-info">

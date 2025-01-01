@@ -143,6 +143,14 @@
             index > 0 &&
             index <= 18
           ) {
+            sessionStorage.setItem(
+              "swiperMedia",
+              JSON.stringify({
+                url: url,
+                text: explanation,
+                title: title,
+              })
+            );
             const hashParams = new URLSearchParams(
               window.location.hash.substring(1)
             );
