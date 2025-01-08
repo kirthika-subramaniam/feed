@@ -33,7 +33,7 @@ DONE: Add columns for Title and Description in the Google Sheet - Matt B
 
 3.) DONE: New swiper control and text that scrolls in player.  - Shreyas
 
-4.) TO DO: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously.
+4.) DONE: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously. - Shreyas
 
 5.) IN PROGRESS: Membersense development and implementation using Discord API - Yunbo
 
@@ -54,7 +54,7 @@ Embed and show the FeedPlayer when choosing "images" at [/home/repo/](../home/re
 
 11.) TO DO: Pull the replies for each Bluesky post in the feed. Use the screen-grab technique that we use to grab images from news sites that are listed in the feed. Scrape the posts from the Bluesky website. Grab replies for the top 3 posts. If the process doesn't work, leave the attempt commented out. - Noopur
 
-12.) DONE - List of feeds on right of player with links to /feed/view/#feed= - Kalyan
+12.) DONE: List of feeds on right of player with links to /feed/view/#feed= - Kalyan
 
 13.) Hide the "link icon" in the upper right unless a video is being viewed.
 

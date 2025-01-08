@@ -4,6 +4,7 @@ import { formatTime } from "../utils/formatTime";
 import "./VideoPlayer.scss";
 import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 
 function VideoPlayer({
   autoplay = false,
@@ -38,7 +39,7 @@ function VideoPlayer({
 
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
-  const [isExpanded, setIsExpanded] = useState("Expand"); //23
+  const [isExpanded, setIsExpanded] = useState(false); //23
 
   const imageDuration = 4;
 
@@ -403,8 +404,29 @@ function VideoPlayer({
     }
   };
 
+  const handleExpand = () => {
+    if (isPlaying) {
+      pause();
+    }
+    setIsExpanded(true);
+  };
+
+  const handleReduce = () => {
+    if (!isPlaying) {
+      play();
+    }
+    setIsExpanded(false);
+  };
+
   const toggleText = () => {
-    setIsExpanded((prev) => !prev);
+    isExpanded ? handleReduce() : handleExpand();
+  };
+
+  const handleMouseLeave = () => {
+    if (isExpanded && !isPlaying) {
+      play();
+      setIsExpanded(false);
+    }
   };
 
   useEffect(() => {
@@ -540,7 +562,10 @@ function VideoPlayer({
       className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`}
       ref={containerRef}
     >
-      <div className="VideoPlayer__video-container">
+      <div
+        className="VideoPlayer__video-container"
+        onMouseLeave={handleMouseLeave}
+      >
         {isLoading ? (
           <div className="VideoPlayer__loading">
             <div className="spinner"></div>
@@ -615,16 +640,32 @@ function VideoPlayer({
           )}
         </div>
         {!isLoading && currentMedia && (
-          <div className="VideoPlayer__overlay">
+          <div
+            className={`VideoPlayer__overlay ${
+              isExpanded ? "expanded-overlay" : ""
+            }`}
+          >
             <div className="VideoPlayer__info">
               <h2>
-                {currentMedia.title || "Untitled"} |{" "}
+                {currentMedia.title || "Untitled"}{" "}
                 <span onClick={toggleText} className="toggle-text">
                   {" "}
-                  {isExpanded ? "Reduce" : "Expand"}{" "}
+                  {isExpanded ? (
+                    <FaChevronUp
+                      style={{ marginRight: "5px", verticalAlign: "middle"}}
+                      title="Reduce"
+                    />
+                  ) : (
+                    <FaChevronDown
+                      style={{ marginRight: "5px", verticalAlign: "middle" }}
+                      title="Expand"
+                    />
+                  )}{" "}
                 </span>
               </h2>
-              <p className={isExpanded ? "expanded" : "collapsed"}>{currentMedia.text || "No description available"}</p>
+              <p className={isExpanded ? "expanded" : "collapsed"}>
+                {currentMedia.text || "No description available"}
+              </p>
             </div>
           </div>
         )}

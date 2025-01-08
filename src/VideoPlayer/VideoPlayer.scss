@@ -131,7 +131,6 @@
   }
 
   &__progress {
-    // position: absolute;
     width: 0%;
     height: 0.5rem;
     background: linear-gradient(90deg, #ffe600 -50%, #ffcc00 50%);
@@ -270,11 +269,10 @@
   &__video-container:hover {
     .VideoPlayer__overlay {
       background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-    }
+      transition: all 0.3s ease;
 
-    .VideoPlayer__info {
-      h2 {
-        font-size: 24px;
+      &.expanded-overlay:hover {
+        top: 0;
       }
 
       &:hover {
@@ -288,13 +286,19 @@
           }
 
           &.expanded {
-            max-height: 500px; // Adjust to suit the expanded height
+            max-height: 100%; // Adjust to suit the expanded height
             opacity: 1;
-            font-size: 16px;
+            font-size: 20px;
             margin-top: 10px;
             overflow: auto;
           }
         }
+      }
+    }
+
+    .VideoPlayer__info {
+      h2 {
+        font-size: 24px;
       }
 
       .toggle-text {
