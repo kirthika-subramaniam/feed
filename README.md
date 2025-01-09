@@ -56,7 +56,7 @@ Embed and show the FeedPlayer when choosing "images" at [/home/repo/](../home/re
 
 12.) DONE: List of feeds on right of player with links to /feed/view/#feed= - Kalyan
 
-13.) Hide the "link icon" in the upper right unless a video is being viewed.
+13.) Hide the "link icon" in the upper right unless a video is being viewed. - Jashwanth
 
 ### Building Transparency
 
