@@ -4,6 +4,7 @@ import { formatTime } from "../utils/formatTime";
 import "./VideoPlayer.scss";
 import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 
 function VideoPlayer({
   autoplay = false,
@@ -38,6 +39,7 @@ function VideoPlayer({
 
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
+  const [isExpanded, setIsExpanded] = useState(false); //23
 
   const imageDuration = 4;
 
@@ -146,48 +148,6 @@ function VideoPlayer({
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [mediaList, listofMedia]);
-
-  // const [imageFiles, setImageFiles] = useState([]);
-
-  // Function to fetch image files
-  // const loadImageFiles = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //         const owner = "modelearth";
-  //         const repo = "requests";
-  //         const branch = "main";
-
-  //         const repoFeed = mediaList.find(media => media.feed.trim() === "repo")
-  //         console.log("Repo data URL : " + repoFeed.url)
-
-  //         // const response = await axios.get(
-  //         //     `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
-  //         // );
-
-  //         const response = await axios.get(
-  //             `${repoFeed.url}`
-  //         );
-
-  //         const files = response.data.tree.filter((file) =>
-  //             /\.(jpg|jpeg|gif)$/i.test(file.path)
-  //         );
-
-  //         setImageFiles(
-  //             files.map((file) => ({
-  //                 name: file.path,
-  //                 url: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`,
-  //             }))
-  //         );
-  //     } catch (err) {
-  //         console.error("Error fetching image files:", err);
-  //     }
-  // };
-
-  // useEffect(() => {
-  //     if (mediaList && mediaList.length > 0) {
-  //         loadImageFiles();
-  //     }
-  // }, [mediaList]);
 
   useEffect(() => {
     if (mediaList && mediaList.length > 0) {
@@ -398,23 +358,17 @@ function VideoPlayer({
     const rect = progressBar.getBoundingClientRect();
     const clickX = event.clientX - rect.left; // Click position relative to the progress bar
     const progressWidth = rect.width;
-
     const clickRatio = clickX / progressWidth; // Ratio of click position to the total width
     const totalSlides =
       selectedMediaList.length < 7 ? selectedMediaList.length : 7;
     const targetSlide = Math.floor(clickRatio * totalSlides);
-
     console.log(`Navigating to slide: ${targetSlide}`);
-    moveToSlide(activeFeed, targetSlide);
+    moveToSlide(targetSlide);
   };
 
-  const moveToSlide = useCallback((activeFeed, index) => {
+  const moveToSlide = useCallback((index) => {
     setCurrentMediaIndex(() => {
       console.log("Move to: ", index);
-      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
-      const newHash = `feed=${activeFeed}&scene=${index + 1}`;
-      const newURL = `${currentURL}#${newHash}`; // Append the new hash to the URL
-      window.history.replaceState(null, "", newURL);
       return index;
     });
   }, []);
@@ -447,6 +401,31 @@ function VideoPlayer({
     setIsMute(!isMute);
     if (videoRef.current) {
       videoRef.current.muted = !isMute;
+    }
+  };
+
+  const handleExpand = () => {
+    if (isPlaying) {
+      pause();
+    }
+    setIsExpanded(true);
+  };
+
+  const handleReduce = () => {
+    if (!isPlaying) {
+      play();
+    }
+    setIsExpanded(false);
+  };
+
+  const toggleText = () => {
+    isExpanded ? handleReduce() : handleExpand();
+  };
+
+  const handleMouseLeave = () => {
+    if (isExpanded && !isPlaying) {
+      play();
+      setIsExpanded(false);
     }
   };
 
@@ -583,7 +562,10 @@ function VideoPlayer({
       className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`}
       ref={containerRef}
     >
-      <div className="VideoPlayer__video-container">
+      <div
+        className="VideoPlayer__video-container"
+        onMouseLeave={handleMouseLeave}
+      >
         {isLoading ? (
           <div className="VideoPlayer__loading">
             <div className="spinner"></div>
@@ -651,17 +633,32 @@ function VideoPlayer({
                   title={`Move to slide ${index + 1}`}
                   onClick={(e) => {
                     e.stopPropagation(); // Prevent the progress bar click handler from triggering
-                    moveToSlide(activeFeed, index);
+                    moveToSlide(index);
                   }}
                 ></div>
               )
           )}
         </div>
         {!isLoading && currentMedia && (
-          <div className="VideoPlayer__overlay">
+          <div
+            className={`VideoPlayer__overlay ${
+              isExpanded ? "expanded-overlay" : ""
+            }`}
+          >
             <div className="VideoPlayer__info">
-              <h2>{currentMedia.title || "Untitled"}</h2>
-              <p>{currentMedia.text || "No description available"}</p>
+              <h2>
+                {currentMedia.title || "Untitled"}{" "}
+                <span onClick={toggleText} className="toggle-text">
+                  {isExpanded ? (
+                    <FaChevronDown title="Reduce" size={20}/>
+                  ) : (
+                    <FaChevronUp title="Expand" size={20}/>
+                  )}
+                </span>
+              </h2>
+              <p className={isExpanded ? "expanded" : "collapsed"}>
+                {currentMedia.text || "No description available"}
+              </p>
             </div>
           </div>
         )}
@@ -677,38 +674,6 @@ function VideoPlayer({
             </span>
             <div className="VideoPlayer__caret"></div>
           </div>
-          {/* <ul
-            className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}
-          >
-            {mediaList &&
-              mediaList.map((media, idx) => (
-                <li
-                  key={idx}
-                  className={`${currentMediaIndex === idx ? "active" : ""} ${
-                    loadedFeeds.includes(media.feed.trim().toLowerCase())
-                      ? ""
-                      : "loading"
-                  }`}
-                  onClick={() => {
-                    if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
-                      setIndex(idx);
-                      setIsDropdownActive(false);
-                      setCurrentMediaIndex(0);
-                      setSelectedMediaList(listofMedia[media.title]);
-                      setCurrentMedia(listofMedia[media.title][0]);
-                    } else {
-                      loadFeed(media, listofMedia);
-                    }
-                  }}
-                >
-                  {media.title || media.feed}
-                  {loadingFeeds[media.title]
-                    ? " (Loading...)"
-                    : !loadedFeeds.includes(media.feed.trim().toLowerCase()) &&
-                      " (Click to load)"}
-                </li>
-              ))}
-          </ul> */}
           <ul
             className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}
           >
@@ -816,7 +781,7 @@ function VideoPlayer({
 VideoPlayer.propTypes = {
   autoplay: PropTypes.bool,
   isFullScreen: PropTypes.bool.isRequired,
-  setIsFullScreen: PropTypes.bool,
+  setIsFullScreen: PropTypes.func.isRequired,
   handleFullScreen: PropTypes.func.isRequired,
 };
 
