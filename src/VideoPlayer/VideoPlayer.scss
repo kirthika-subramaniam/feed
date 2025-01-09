@@ -260,6 +260,7 @@
         float: right;
         margin-right: 42px;
         vertical-align: middle;
+        display: none;
       }
     }
 
@@ -267,7 +268,7 @@
       margin: 0;
       max-height: 0;
       opacity: 0;
-      display: hidden;
+      overflow: hidden;
       transition: all 0.3s ease;
     }
   }
@@ -283,6 +284,10 @@
       }
 
       &:hover {
+        .toggle-text {
+          display: block;
+        }
+
         p {
           &.collapsed {
             max-height: 100px; // Height when collapsed
@@ -313,7 +318,6 @@
           &:hover {
             color: #ffcc00;
           }
-
         }
       }
     }
