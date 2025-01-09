@@ -649,18 +649,11 @@ function VideoPlayer({
               <h2>
                 {currentMedia.title || "Untitled"}{" "}
                 <span onClick={toggleText} className="toggle-text">
-                  {" "}
                   {isExpanded ? (
-                    <FaChevronUp
-                      style={{ marginRight: "5px", verticalAlign: "middle"}}
-                      title="Reduce"
-                    />
+                    <FaChevronDown title="Reduce" size={30}/>
                   ) : (
-                    <FaChevronDown
-                      style={{ marginRight: "5px", verticalAlign: "middle" }}
-                      title="Expand"
-                    />
-                  )}{" "}
+                    <FaChevronUp title="Expand" size={30}/>
+                  )}
                 </span>
               </h2>
               <p className={isExpanded ? "expanded" : "collapsed"}>

@@ -255,6 +255,12 @@
       font-size: 18px;
       margin: 0 0 5px 0;
       color: white;
+
+      .toggle-text {
+        float: right;
+        margin-right: 42px;
+        vertical-align: middle;
+      }
     }
 
     p {
@@ -269,10 +275,11 @@
   &__video-container:hover {
     .VideoPlayer__overlay {
       background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-      transition: all 0.3s ease;
 
       &.expanded-overlay:hover {
+        background: linear-gradient(transparent 2.5%, rgba(0, 0, 0, 0.7) 20%);
         top: 0;
+        z-index: 11;
       }
 
       &:hover {
@@ -288,7 +295,7 @@
           &.expanded {
             max-height: 100%; // Adjust to suit the expanded height
             opacity: 1;
-            font-size: 20px;
+            font-size: 18px;
             margin-top: 10px;
             overflow: auto;
           }
@@ -299,15 +306,14 @@
     .VideoPlayer__info {
       h2 {
         font-size: 24px;
-      }
 
-      .toggle-text {
-        cursor: pointer;
-        
-        &:hover {
-          font-size: 30px;
-          text-decoration: underline;
-          color: #ffcc00;
+        .toggle-text {
+          cursor: pointer;
+
+          &:hover {
+            color: #ffcc00;
+          }
+
         }
       }
     }
