@@ -201,6 +201,7 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       const response = await axios.get(media.url);
+      console.log("response: ", response);
       const owner = "modelearth";
       const repo = "requests";
       const branch = "main";
@@ -238,6 +239,12 @@ function VideoPlayer({
               text: "No description available",
               title: file.path.split("/").pop(),
             }));
+        case "Videos":
+          return response.data.map((url) => ({
+            url,
+            text: "No Description Available",
+            title: url.split("/").pop(),
+          }));
         default:
           return response.data.map((item) => ({
             url: item.hdurl || item.url,
