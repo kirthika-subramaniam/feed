@@ -201,7 +201,7 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       const response = await axios.get(media.url);
-      console.log("response: ", response);
+      console.log("response: ", response.data);
       const owner = "modelearth";
       const repo = "requests";
       const branch = "main";
@@ -239,10 +239,10 @@ function VideoPlayer({
               text: "No description available",
               title: file.path.split("/").pop(),
             }));
-        case "Videos":
-          return response.data.map((url) => ({
+        case "videos":
+          return response.data[0].videosURLs.map((url) => ({
             url,
-            text: "No Description Available",
+            text: "No description available",
             title: url.split("/").pop(),
           }));
         default:
@@ -657,9 +657,9 @@ function VideoPlayer({
                 {currentMedia.title || "Untitled"}{" "}
                 <span onClick={toggleText} className="toggle-text">
                   {isExpanded ? (
-                    <FaChevronDown title="Reduce" size={20}/>
+                    <FaChevronDown title="Reduce" size={20} />
                   ) : (
-                    <FaChevronUp title="Expand" size={20}/>
+                    <FaChevronUp title="Expand" size={20} />
                   )}
                 </span>
               </h2>
