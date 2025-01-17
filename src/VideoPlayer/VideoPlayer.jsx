@@ -4,7 +4,7 @@ import { formatTime } from "../utils/formatTime";
 import "./VideoPlayer.scss";
 import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 
 function VideoPlayer({
   autoplay = false,
@@ -40,6 +40,7 @@ function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
   const [isExpanded, setIsExpanded] = useState(false); //23
+  const [videoPaused, setVideoPaused] = useState(false); //24
 
   const imageDuration = 4;
 
@@ -201,7 +202,6 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       const response = await axios.get(media.url);
-      console.log("response: ", response.data);
       const owner = "modelearth";
       const repo = "requests";
       const branch = "main";
@@ -586,12 +586,35 @@ function VideoPlayer({
               alt={currentMedia.title || "Media"}
             />
           ) : isVideoFile(currentMedia.url) ? (
-            <video
-              ref={videoRef}
-              src={currentMedia.url}
-              poster="src/assets/videos/intro.jpg"
-              muted={isMute}
-            ></video>
+            <div className="video-wrapper">
+              <video
+                ref={videoRef}
+                className="video-image"
+                src={currentMedia.url}
+                poster="src/assets/images/intro-a.jpg"
+                muted={isMute}
+                onClick={handlePlayPause}
+              ></video>
+              {!isPlaying && (
+                <button
+                  className="play-button"
+                  onClick={handlePlayPause}
+                  aria-label="Play Video"
+                >
+                  <FaPlay size={30} />
+                </button>
+              )}
+
+              {isPlaying && (
+                <button
+                  className="play-button"
+                  onClick={handlePlayPause}
+                  aria-label="Pause Video"
+                >
+                  <FaPause size={30} />
+                </button>
+              )}
+            </div>
           ) : (
             <div className="VideoPlayer__unsupported-media">
               <p>Unsupported media type</p>
