@@ -40,7 +40,6 @@ function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
   const [isExpanded, setIsExpanded] = useState(false); //23
-  const [videoPaused, setVideoPaused] = useState(false); //24
 
   const imageDuration = 4;
 
