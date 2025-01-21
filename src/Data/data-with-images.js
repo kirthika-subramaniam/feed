@@ -11,6 +11,4 @@ const videosURLs = [
     "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
 ]
 
-
-
 export { videosURLs };
