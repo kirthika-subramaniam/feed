@@ -244,6 +244,17 @@ function VideoPlayer({
             text: "No description available",
             title: url.split("/").pop(),
           }));
+        case "feedview":
+          const bigBunnyLink = response.data[0].videosURLs[1];
+          return bigBunnyLink
+            ? [
+              {
+                url: bigBunnyLink,
+                text: "No description available",
+                title: bigBunnyLink.split("/").pop(),
+              },
+            ]
+            : [];
         default:
           return response.data.map((item) => ({
             url: item.hdurl || item.url,
@@ -535,9 +546,9 @@ function VideoPlayer({
     const handleFullScreenChange = () => {
       setIsFullScreen(
         document.fullscreenElement ||
-          document.webkitFullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullscreenElement
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
       );
     };
 
@@ -634,13 +645,12 @@ function VideoPlayer({
             style={{
               width:
                 selectedMediaList.length > 0
-                  ? `${
-                      ((currentMediaIndex + 1) /
-                        (selectedMediaList.length < 7
-                          ? selectedMediaList.length
-                          : 7)) *
-                      100
-                    }%`
+                  ? `${((currentMediaIndex + 1) /
+                    (selectedMediaList.length < 7
+                      ? selectedMediaList.length
+                      : 7)) *
+                  100
+                  }%`
                   : "0%",
             }}
           ></div>
@@ -651,13 +661,12 @@ function VideoPlayer({
                   key={index}
                   className="VideoPlayer__progress-point"
                   style={{
-                    left: `${
-                      ((index + 1) /
+                    left: `${((index + 1) /
                         (selectedMediaList.length < 7
                           ? selectedMediaList.length
                           : 7)) *
                       99.75
-                    }%`,
+                      }%`,
                   }}
                   title={`Move to slide ${index + 1}`}
                   onClick={(e) => {
@@ -670,9 +679,8 @@ function VideoPlayer({
         </div>
         {!isLoading && currentMedia && (
           <div
-            className={`VideoPlayer__overlay ${
-              isExpanded ? "expanded-overlay" : ""
-            }`}
+            className={`VideoPlayer__overlay ${isExpanded ? "expanded-overlay" : ""
+              }`}
           >
             <div className="VideoPlayer__info">
               <h2>
@@ -710,11 +718,10 @@ function VideoPlayer({
               mediaList.map((media, idx) => (
                 <li
                   key={idx}
-                  className={`${currentMediaIndex === idx ? "active" : ""} ${
-                    loadedFeeds.includes(media.feed.trim().toLowerCase())
+                  className={`${currentMediaIndex === idx ? "active" : ""} ${loadedFeeds.includes(media.feed.trim().toLowerCase())
                       ? ""
                       : "loading"
-                  }`}
+                    }`}
                   onClick={() => {
                     if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
                       setIndex(idx);
@@ -796,9 +803,8 @@ function VideoPlayer({
             onClick={toggleFullScreen}
           >
             <i
-              className={`ri-${
-                isFullScreen ? "fullscreen-exit" : "fullscreen"
-              }-line`}
+              className={`ri-${isFullScreen ? "fullscreen-exit" : "fullscreen"
+                }-line`}
             ></i>
           </button>
         </div>
