@@ -305,7 +305,7 @@ function VideoPlayer({
     }
   };
 
-  const pause = () => {
+  const pause = useCallback(() => {
     console.log("Pause function called");
     if (currentMedia) {
       if (isImageFile(currentMedia.url)) {
@@ -316,7 +316,7 @@ function VideoPlayer({
       }
     }
     setIsPlaying(false);
-  };
+  }, [currentMedia]);
 
   const stop = () => {
     if (currentMedia && isImageFile(currentMedia.url)) {
@@ -516,6 +516,33 @@ function VideoPlayer({
       console.log("Initial media set:", selectedMediaList[0], "Index: 0");
     }
   }, [selectedMediaList, currentMedia, setCurrentMedia]);
+
+  useEffect(() => {
+    let lastUrl = window.location.hash;
+    
+    const handleURLChange = () => {
+      const currentURL = window.location.hash;
+      console.log("URL changed: " + currentURL);
+      if (currentURL.includes("swiper") && isPlaying) 
+        pause();
+      lastUrl = currentURL;
+    };
+
+    // Check for URL changes
+    const interval = setInterval(() => {
+      if (window.location.hash !== lastUrl) {
+        handleURLChange();
+      }
+    }, 100);
+
+    // Also listen for popstate
+    window.addEventListener("popstate", handleURLChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("popstate", handleURLChange);
+    };
+}, [isPlaying, pause]);
 
   useEffect(() => {
     console.log(
