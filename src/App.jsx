@@ -270,9 +270,20 @@ function App() {
         return (
           <div className="feed-player-container">
             {!isPopup && (
-              <button className="popup-btn" onClick={() => setIsPopup(true)}>
-                <i className="ri-more-2-fill"></i>
+             <div className="fullscreen-nav">
+              <button className="menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <i className="ri-more-2-fill"></i>
+                  <Menu size={24} />
               </button>
+              {isMenuOpen && (
+                <div className="fullscreen-menu">
+                <button className="popup-btn" onClick={() => setIsPopup(true)}>
+                 <Minimize size={24} />
+                  <span>Paste your Video URL</span>
+                </button>
+                </div>
+              )}
+            </div>
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
