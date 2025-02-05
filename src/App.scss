@@ -170,6 +170,37 @@
     font-size: 1.5rem;
   }
 
+  .popup-menu{
+    position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        min-width: 200px;
+
+        button {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 5px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #f0f0f0;
+          }
+
+          svg {
+            margin-right: 10px;
+          }
+        }
+  }
+
   .member-sense-container {
     width: 100%;
     max-width: 400px;

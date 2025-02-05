@@ -52,6 +52,7 @@ function App() {
 
   // Feed player state
   const [isPopup, setIsPopup] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { setVideoList, setCurrentVideoSrc } = useContext(Context);
 
   // Auth state
@@ -270,19 +271,18 @@ function App() {
         return (
           <div className="feed-player-container">
             {!isPopup && (
-             <div>
-             <button className="pop-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              <div>
+             <button className="pop-btn" onClick={() => setIsPopupOpen(true)}>
                   <i className="ri-more-2-fill"></i>
               </button>
-              {isMenuOpen && (
-                <div className="fullscreen-menu">
-                <button className="popup-btn" onClick={() => setIsPopup(true)}>
-                 <Minimize size={24} />
+              {isPopupOpen && (
+                <div className="popup-menu">
+                <button onClick={() => setIsPopup(true)}>
                   <span>Paste your Video URL</span>
                 </button>
                 </div>
               )} 
-              </div>
+            </div>  
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
