@@ -271,8 +271,8 @@ function App() {
         return (
           <div className="feed-player-container">
             {!isPopup && (
-              <>
-             <button className="popup-btn" onClick={() => setIsPopupOpen(!isPopupOpen)}>
+            <div className="popup-container">
+              <button className="popup-btn" onClick={() => setIsPopupOpen(!isPopupOpen)}>
                   <i className="ri-more-2-fill"></i>
               </button>
               {isPopupOpen && (
@@ -282,7 +282,7 @@ function App() {
                 </button>
                 </div>
              )} 
-             </>
+             </div>
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
