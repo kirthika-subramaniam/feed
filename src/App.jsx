@@ -271,8 +271,8 @@ function App() {
         return (
           <div className="feed-player-container">
             {!isPopup && (
-              <div>
-             <button className="pop-btn" onClick={() => setIsPopupOpen(true)}>
+              <>
+             <button className="pop-btn" onClick={() => setIsPopupOpen(!isPopupOpen)}>
                   <i className="ri-more-2-fill"></i>
               </button>
               {isPopupOpen && (
@@ -281,8 +281,8 @@ function App() {
                   <span>Paste your Video URL</span>
                 </button>
                 </div>
-              )} 
-            </div>  
+             )} 
+             </>
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
