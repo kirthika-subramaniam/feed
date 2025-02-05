@@ -14,7 +14,7 @@ import MemberSense from "./components/MemberSenseComponents/MemberSenseLogin/Mem
 import MemberShowcase from "./components/MemberSenseComponents/MemberShowcase/MemberShowcase";
 import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChannelViewer/DiscordChannelViewer";
 
-// Context
+// Contexty
 import { Context } from "./Context/Context";
 import ContextProvider from "./Context/ContextGoogle";
 
@@ -270,10 +270,9 @@ function App() {
         return (
           <div className="feed-player-container">
             {!isPopup && (
-            <div className="fullscreen-nav">
-              <button className="menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+             <div>
+             <button className="pop-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                   <i className="ri-more-2-fill"></i>
-                  <Menu size={24} />
               </button>
               {isMenuOpen && (
                 <div className="fullscreen-menu">
@@ -282,9 +281,8 @@ function App() {
                   <span>Paste your Video URL</span>
                 </button>
                 </div>
-              )}
-            </div>
-
+              )} 
+              </div>
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
