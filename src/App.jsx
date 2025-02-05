@@ -271,6 +271,7 @@ function App() {
           <div className="feed-player-container">
             {!isPopup && (
                 <button className="popup-btn" onClick={() => setIsPopup(true)}>
+                  <i className="ri-links-line"></i>
                 </button>
                 
             )}
