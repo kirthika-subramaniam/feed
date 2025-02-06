@@ -163,16 +163,27 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      z-index: 100;
+      z-index: 2000;
+      color: #fff;
       background-color: rgba(0, 0, 0, 0.5);
       border: none;
+      background: none;
       border-radius: 50%;
       cursor: pointer;
+      transition: background-color 0.3s ease;
       padding: 10px;
-      font-size: 1.5rem;
+      font-size: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+      }
     }
 
     .popup-menu{
