@@ -278,7 +278,7 @@ function App() {
               {isPopupOpen && (
                 <div className="popup-menu">
                 <button  className ="ri-links-line" onClick={() => setIsPopup(!isPopup)}>
-                  <span> Paste your Video URL</span>
+                  <span> Paste Your Video URL</span>
                 </button>
                 </div>
              )} 
