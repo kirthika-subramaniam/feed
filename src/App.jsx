@@ -14,7 +14,7 @@ import MemberSense from "./components/MemberSenseComponents/MemberSenseLogin/Mem
 import MemberShowcase from "./components/MemberSenseComponents/MemberShowcase/MemberShowcase";
 import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChannelViewer/DiscordChannelViewer";
 
-// Context
+// Contexty
 import { Context } from "./Context/Context";
 import ContextProvider from "./Context/ContextGoogle";
 
@@ -52,6 +52,7 @@ function App() {
 
   // Feed player state
   const [isPopup, setIsPopup] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { setVideoList, setCurrentVideoSrc } = useContext(Context);
 
   // Auth state
@@ -270,9 +271,18 @@ function App() {
         return (
           <div className="feed-player-container">
             {!isPopup && (
-              <button className="popup-btn" onClick={() => setIsPopup(true)}>
-                <i className="ri-more-2-fill"></i>
+            <div className="popup-container">
+              <button className="popup-btn" onClick={() => setIsPopupOpen(!isPopupOpen)}>
+                 <i className="ri-menu-line"></i>
               </button>
+              {isPopupOpen && (
+                <div className="popup-menu">
+                <button  className ="ri-links-line" onClick={() => setIsPopup(!isPopup)}>
+                  <span> Paste Your Video URL </span>
+                </button>
+                </div>
+             )} 
+             </div>
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
