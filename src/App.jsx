@@ -9,13 +9,13 @@ import {
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
-import Popup from "./components/Popup/Popup";
+// import Popup from "./components/Popup/Popup";
 import MemberSense from "./components/MemberSenseComponents/MemberSenseLogin/MemberSense";
 import MemberShowcase from "./components/MemberSenseComponents/MemberShowcase/MemberShowcase";
 import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChannelViewer/DiscordChannelViewer";
 
 // Context
-import { Context } from "./Context/Context";
+// import { Context } from "./Context/Context";
 import ContextProvider from "./Context/ContextGoogle";
 
 // Services
@@ -51,8 +51,8 @@ function App() {
   const appRef = useRef(null);
 
   // Feed player state
-  const [isPopup, setIsPopup] = useState(false);
-  const { setVideoList, setCurrentVideoSrc } = useContext(Context);
+  // const [isPopup, setIsPopup] = useState(false);
+  // const { setVideoList, setCurrentVideoSrc } = useContext(Context);
 
   // Auth state
   const [token, setToken] = useState("");
@@ -269,14 +269,14 @@ function App() {
       case "FeedPlayer":
         return (
           <div className="feed-player-container">
-            {!isPopup && (
+            {/* {!isPopup && (
               <button className="popup-btn" onClick={() => setIsPopup(true)}>
-                <i className="ri-links-line"></i>
+                <i className="ri-more-2-line"></i>
               </button>
             )}
             {isPopup && (
               <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
-            )}
+            )} */}
             <VideoPlayer
               autoplay={true}
               isFullScreen={isFullScreen}
