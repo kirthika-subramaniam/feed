@@ -40,7 +40,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
   const [isExpanded, setIsExpanded] = useState(false); // 24
   const menuRef = useRef(null); // 25
 
-  const [isPopup, setIsPopup] = useState(false); // 26
+  const [isMenu, setIsMenu] = useState(false); // 26
   const [selectedOption, setSelectedOption] = useState(null); // 27
 
   const imageDuration = 4;
@@ -59,21 +59,26 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
     };
   };
 
+  const handlePopupClick = () => {
+    setSelectedOption(null);
+    setIsMenu(true);
+  };
+
   const handleMenuClick = (option) => {
-    setIsPopup(false);
+    setIsMenu(false);
     setSelectedOption(option);
-  }
+  };
 
   // Click outside to close the menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       // If menuRef exists and the click is NOT inside it, close the menu
-      if (menuRef.current && !menuRef.current.contains(event.target)) setIsPopup(false);
+      if (menuRef.current && !menuRef.current.contains(event.target)) setIsMenu(false);
     };
 
-    if (isPopup) document.addEventListener("mousedown", handleClickOutside);
+    if (isMenu) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isPopup]);
+  }, [isMenu]);
 
   useEffect(() => {
     if (currentMedia && selectedMediaList.length > 0) updateURLHash(mediaList[index].feed, currentMediaIndex);
@@ -666,12 +671,12 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
           </div>
         )}
         <div className="VideoPlayer__toggleMenu" ref={menuRef}>
-          {!isPopup && (
-            <button className="popup-btn" onClick={() => setIsPopup(true)} title="Click to Toggle Options">
+          {!isMenu && (
+            <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
               <i className="ri-more-2-line"></i>
             </button>
           )}
-          {isPopup && (
+          {isMenu && (
             <div className="menu-content">
               <ul className="menu-list">
                 <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
@@ -684,45 +689,47 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
             </div>
           )}
         </div>
-        {selectedOption === "url" && (<Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />)}
-        {selectedOption === "feeds" && (<div className="VideoPlayer__dropdown">
-          <div className="VideoPlayer__select" onClick={() => setIsDropdownActive(!isDropdownActive)}>
-            <span>{mediaList && mediaList[index] ? mediaList[index].title : "Select Media"}</span>
-            <div className="VideoPlayer__caret"></div>
-          </div>
-          <ul className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}>
-            {mediaList &&
-              mediaList.map((media, idx) => (
-                <li
-                  key={idx}
-                  className={`${currentMediaIndex === idx ? "active" : ""} ${
-                    loadedFeeds.includes(media.feed.trim().toLowerCase()) ? "" : "loading"
-                  }`}
-                  onClick={() => {
-                    if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
-                      setIndex(idx);
-                      setIsDropdownActive(false);
-                      setCurrentMediaIndex(0);
-                      setSelectedMediaList(listofMedia[media.title]);
-                      setCurrentMedia(listofMedia[media.title][0]);
-                      updateURLHash(media.feed, 0); // Update hash
-                    } else {
-                      loadFeed(media, listofMedia).then(() => {
+        {selectedOption === "url" && <Popup {...{ setVideoList, setCurrentVideoSrc, setSelectedOption }} />}
+        {selectedOption === "feeds" && (
+          <div className="VideoPlayer__dropdown">
+            <div className="VideoPlayer__select" onClick={() => setIsDropdownActive(!isDropdownActive)}>
+              <span>{mediaList && mediaList[index] ? mediaList[index].title : "Select Media"}</span>
+              <div className="VideoPlayer__caret"></div>
+            </div>
+            <ul className={`VideoPlayer__menu ${isDropdownActive ? "active" : ""}`}>
+              {mediaList &&
+                mediaList.map((media, idx) => (
+                  <li
+                    key={idx}
+                    className={`${currentMediaIndex === idx ? "active" : ""} ${
+                      loadedFeeds.includes(media.feed.trim().toLowerCase()) ? "" : "loading"
+                    }`}
+                    onClick={() => {
+                      if (loadedFeeds.includes(media.feed.trim().toLowerCase())) {
                         setIndex(idx);
                         setIsDropdownActive(false);
                         setCurrentMediaIndex(0);
                         setSelectedMediaList(listofMedia[media.title]);
                         setCurrentMedia(listofMedia[media.title][0]);
-                        updateURLHash(media.feed, 0); // Update hash after loading
-                      });
-                    }
-                  }}
-                >
-                  {media.title || media.feed}
-                </li>
-              ))}
-          </ul>
-        </div>)}
+                        updateURLHash(media.feed, 0); // Update hash
+                      } else {
+                        loadFeed(media, listofMedia).then(() => {
+                          setIndex(idx);
+                          setIsDropdownActive(false);
+                          setCurrentMediaIndex(0);
+                          setSelectedMediaList(listofMedia[media.title]);
+                          setCurrentMedia(listofMedia[media.title][0]);
+                          updateURLHash(media.feed, 0); // Update hash after loading
+                        });
+                      }
+                    }}
+                  >
+                    {media.title || media.feed}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="VideoPlayer__controls">
         <div className="control-group control-group-btn">
