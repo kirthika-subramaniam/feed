@@ -11,37 +11,37 @@ import Popup from "../components/Popup/Popup";
 function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFullScreen }) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
-  const { setVideoList, setCurrentVideoSrc } = useContext(VideoContext); // 1
-  const [isPlaying, setIsPlaying] = useState(autoplay); // 2
-  const [currentVolume, setCurrentVolume] = useState(1); // 3
-  const [isMute, setIsMute] = useState(true); // 4
-  const [imageElapsed, setImageElapsed] = useState(0); // 5
-  const containerRef = useRef(null); // 6
-  const videoRef = useRef(null); // 7
-  const videoRangeRef = useRef(null); // 8
-  const volumeRangeRef = useRef(null); // 9
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0); // 10
-  const imageTimerRef = useRef(null); // 11
+  const { setVideoList, setCurrentVideoSrc } = useContext(VideoContext); // 0
+  const [isPlaying, setIsPlaying] = useState(autoplay); // 1
+  const [currentVolume, setCurrentVolume] = useState(1); // 2
+  const [isMute, setIsMute] = useState(true); // 3
+  const [imageElapsed, setImageElapsed] = useState(0); // 4
+  const containerRef = useRef(null); // 5
+  const videoRef = useRef(null); // 6
+  const videoRangeRef = useRef(null); // 7
+  const volumeRangeRef = useRef(null); // 8
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0); // 9
+  const imageTimerRef = useRef(null); // 10
 
-  const [duration, setDuration] = useState([0, 0]); // 12
-  const [currentTime, setCurrentTime] = useState([0, 0]); // 13
-  const [durationSec, setDurationSec] = useState(0); // 14
-  const [currentSec, setCurrentTimeSec] = useState(0); // 15
+  const [duration, setDuration] = useState([0, 0]); // 11
+  const [currentTime, setCurrentTime] = useState([0, 0]); // 12
+  const [durationSec, setDurationSec] = useState(0); // 13
+  const [currentSec, setCurrentTimeSec] = useState(0); // 14
 
-  const [isDropdownActive, setIsDropdownActive] = useState(false); // 16
-  const [index, setIndex] = useState(0); // 17
-  const [selectedMediaList, setSelectedMediaList] = useState([]); // 18
-  const [listofMedia, setListofMedia] = useState({}); // 19
-  const [loadedFeeds, setLoadedFeeds] = useState([]); // 20
-  const [loadingFeeds, setLoadingFeeds] = useState({}); // 21
+  const [isDropdownActive, setIsDropdownActive] = useState(false); // 15
+  const [index, setIndex] = useState(0); // 16
+  const [selectedMediaList, setSelectedMediaList] = useState([]); // 17
+  const [listofMedia, setListofMedia] = useState({}); // 18
+  const [loadedFeeds, setLoadedFeeds] = useState([]); // 19
+  const [loadingFeeds, setLoadingFeeds] = useState({}); // 20
 
-  const [isLoading, setIsLoading] = useState(true); // 22
-  const [activeFeed, setActiveFeed] = useState("nasa"); // 23
-  const [isExpanded, setIsExpanded] = useState(false); // 24
-  const menuRef = useRef(null); // 25
+  const [isLoading, setIsLoading] = useState(true); // 21
+  const [activeFeed, setActiveFeed] = useState("nasa"); // 22
+  const [isExpanded, setIsExpanded] = useState(false); // 23
+  const menuRef = useRef(null); // 24
 
-  const [isMenu, setIsMenu] = useState(false); // 26
-  const [selectedOption, setSelectedOption] = useState(null); // 27
+  const [isMenu, setIsMenu] = useState(false); // 25
+  const [selectedOption, setSelectedOption] = useState(null); // 26
 
   const imageDuration = 4;
 
@@ -62,18 +62,23 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
   const handlePopupClick = () => {
     setSelectedOption(null);
     setIsMenu(true);
+    pause();
   };
 
   const handleMenuClick = (option) => {
     setIsMenu(false);
     setSelectedOption(option);
+    play();
   };
 
   // Click outside to close the menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       // If menuRef exists and the click is NOT inside it, close the menu
-      if (menuRef.current && !menuRef.current.contains(event.target)) setIsMenu(false);
+      if (menuRef.current && !menuRef.current.contains(event.target)){
+        setIsMenu(false);
+        play();
+      } 
     };
 
     if (isMenu) document.addEventListener("mousedown", handleClickOutside);
