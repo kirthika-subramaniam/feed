@@ -1,5 +1,5 @@
 // External dependencies
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
 import { 

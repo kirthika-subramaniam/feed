@@ -42,6 +42,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
 
   const [isMenu, setIsMenu] = useState(false); // 25
   const [selectedOption, setSelectedOption] = useState(null); // 26
+  const [swiperData, setSwiperData] = useState(null); // 27
 
   const imageDuration = 4;
 
@@ -75,10 +76,10 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
   useEffect(() => {
     const handleClickOutside = (event) => {
       // If menuRef exists and the click is NOT inside it, close the menu
-      if (menuRef.current && !menuRef.current.contains(event.target)){
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenu(false);
         play();
-      } 
+      }
     };
 
     if (isMenu) document.addEventListener("mousedown", handleClickOutside);
@@ -97,6 +98,21 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
       if (selectedFeed) setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
     }
   }, [mediaList]);
+
+  useEffect(() => {
+    const fetchSwiperData = async () => {
+      const swiperRepo = JSON.parse(sessionStorage.getItem("swiperMedia"));
+      if (swiperRepo) {
+        setSwiperData({
+          url: swiperRepo.url,
+          text: swiperRepo.text || "No description available",
+          title: swiperRepo.title || swiperRepo.url.split("/").pop(),
+        });
+      }
+    };
+
+    fetchSwiperData();
+  }, []);
 
   useEffect(() => {
     const { feed, ref } = parseHash();
@@ -213,14 +229,10 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
   const fetchMediaFromAPI = async (media) => {
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
+      if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
+        return swiperData; 
+      }
       const response = await axios.get(media.url);
-      const owner = "modelearth";
-      const repo = "requests";
-      const branch = "main";
-      const repoFeed = mediaList.find((media) => media.feed.trim() === "repo");
-      console.log("Repo data URL : " + repoFeed.url);
-      const responseRepo = await axios.get(`${repoFeed.url}`);
-
       switch (media.feed.trim().toLowerCase()) {
         case "seeclickfix-311":
           return response.data.issues.map((item) => ({
@@ -243,7 +255,13 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
             }
             return photos;
           });
-        case "repo":
+        case "repo": {
+          const owner = "modelearth";
+          const repo = "requests";
+          const branch = "main";
+          const repoFeed = mediaList.find((media) => media.feed.trim() === "repo");
+          console.log("Repo data URL : " + repoFeed.url);
+          const responseRepo = await axios.get(`${repoFeed.url}`);
           return responseRepo.data.tree
             .filter((file) => /\.(jpg|jpeg|gif)$/i.test(file.path))
             .map((file) => ({
@@ -251,6 +269,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
               text: "No description available",
               title: file.path.split("/").pop(),
             }));
+        }
         case "videos":
           return response.data[0].videosURLs.map((url) => ({
             url,
