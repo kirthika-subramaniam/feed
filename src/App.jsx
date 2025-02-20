@@ -1,21 +1,16 @@
 // External dependencies
-import React, { useContext, useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
-import { 
-  Video, Users, MessageCircle, AlertCircle, 
-  Menu, Maximize, Minimize 
-} from "lucide-react";
+import { Video, Users, MessageCircle, AlertCircle, Menu, Maximize, Minimize, Check, Link } from "lucide-react";
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
-import Popup from "./components/Popup/Popup";
 import MemberSense from "./components/MemberSenseComponents/MemberSenseLogin/MemberSense";
 import MemberShowcase from "./components/MemberSenseComponents/MemberShowcase/MemberShowcase";
 import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChannelViewer/DiscordChannelViewer";
 
-// Contexty
-import { Context } from "./Context/Context";
+// Context
 import ContextProvider from "./Context/ContextGoogle";
 
 // Services
@@ -25,7 +20,7 @@ import {
   fetchMessages,
   fetchFakeMembers,
   fetchFakeChannels,
-  fetchFakeMessages
+  fetchFakeMessages,
 } from "./services/Dataservice";
 
 // Styles
@@ -44,16 +39,16 @@ function App() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  
+
   // UI state
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const appRef = useRef(null);
+  const [selectedOption, setSelectedOption] = useState("");
+  const menuOpenRef = useRef(null);
 
   // Feed player state
-  const [isPopup, setIsPopup] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const { setVideoList, setCurrentVideoSrc } = useContext(Context);
+  // const [isPopup, setIsPopup] = useState(false);
 
   // Auth state
   const [token, setToken] = useState("");
@@ -61,7 +56,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [serverInfo, setServerInfo] = useState(null);
-  
+
   // Data state
   const [useMockData, setUseMockData] = useState(true);
   const [members, setMembers] = useState([]);
@@ -88,22 +83,19 @@ function App() {
           setSelectedChannel(fakeChannels[0].id);
         }
       } else {
-        Promise.all([
-          fetchMembers(sessionId),
-          fetchChannels(sessionId)
-        ])
+        Promise.all([fetchMembers(sessionId), fetchChannels(sessionId)])
           .then(([membersData, channelsData]) => {
             setMembers(membersData);
             setChannels(channelsData);
-            console.log("Fetching Channel Data.")
+            console.log("Fetching Channel Data.");
             console.log(channelsData.length);
             if (channelsData.length > 0 && !selectedChannel) {
               setSelectedChannel(channelsData[0].id);
             }
           })
-          .catch(error => {
-            console.error('Error fetching data:', error);
-            setError('Failed to fetch data. Please try again.');
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+            setError("Failed to fetch data. Please try again.");
           })
           .finally(() => setIsLoading(false));
       }
@@ -123,12 +115,12 @@ function App() {
         setIsLoading(false);
       } else {
         fetchMessages(sessionId, selectedChannel)
-          .then(messagesData => {
+          .then((messagesData) => {
             setMessages(messagesData);
           })
-          .catch(error => {
-            console.error('Error fetching messages:', error);
-            setError('Failed to fetch messages. Please try again.');
+          .catch((error) => {
+            console.error("Error fetching messages:", error);
+            setError("Failed to fetch messages. Please try again.");
           })
           .finally(() => setIsLoading(false));
       }
@@ -149,7 +141,7 @@ function App() {
   const handleLogin = async (inputToken) => {
     setIsLoading(true);
     setError("");
-    
+
     if (useMockData) {
       setToken("MockTokenPlaceHolder");
       setSessionId("12345-abcdef-67890");
@@ -169,9 +161,9 @@ function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: inputToken }),
       });
-      
+
       if (!response.ok) throw new Error("Login failed");
-      
+
       const data = await response.json();
       setToken(inputToken);
       setSessionId(data.sessionId);
@@ -214,18 +206,18 @@ function App() {
     setIsLoggingOut(true);
     try {
       const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        headers: { 'Authorization': sessionId }
+        method: "POST",
+        headers: { Authorization: sessionId },
       });
-      if (!response.ok) throw new Error('Logout failed');
+      if (!response.ok) throw new Error("Logout failed");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setTimeout(() => {
-        setToken('');
-        setSessionId('');
+        setToken("");
+        setSessionId("");
         setServerInfo(null);
-        setCurrentView('MemberSense');
+        setCurrentView("MemberSense");
         setIsLoggingOut(false);
       }, 300);
     }
@@ -265,35 +257,18 @@ function App() {
   // Render helpers
   const renderContent = () => {
     const commonProps = { isFullScreen };
-    
+
     switch (currentView) {
       case "FeedPlayer":
         return (
-          <div className="feed-player-container">
-            {!isPopup && (
-            <div className="popup-container">
-              <button className="popup-btn" onClick={() => setIsPopupOpen(!isPopupOpen)}>
-                 <i className="ri-menu-line"></i>
-              </button>
-              {isPopupOpen && (
-                <div className="popup-menu">
-                <button  className ="ri-links-line" onClick={() => setIsPopup(!isPopup)}>
-                  <span> Paste Your Video URL </span>
-                </button>
-                </div>
-             )} 
-             </div>
-            )}
-            {isPopup && (
-              <Popup {...{ setVideoList, setCurrentVideoSrc, setIsPopup }} />
-            )}
-            <VideoPlayer
-              autoplay={true}
-              isFullScreen={isFullScreen}
-              setIsFullScreen={setIsFullScreen}
-              handleFullScreen={handleFullScreen}
-            />
-          </div>
+          <VideoPlayer
+            autoplay={true}
+            isFullScreen={isFullScreen}
+            setIsFullScreen={setIsFullScreen}
+            handleFullScreen={handleFullScreen}
+            selectedOption={selectedOption}
+            setSelectedOption={setSelectedOption}
+          />
         );
       case "MemberSense":
         return (
@@ -312,14 +287,7 @@ function App() {
           />
         );
       case "Showcase":
-        return (
-          <MemberShowcase
-            token={token}
-            members={members}
-            isLoading={isLoading}
-            {...commonProps}
-          />
-        );
+        return <MemberShowcase token={token} members={members} isLoading={isLoading} {...commonProps} />;
       case "DiscordViewer":
         return (
           <DiscordChannelViewer
@@ -359,24 +327,48 @@ function App() {
     ));
   };
 
+  const handleMenuClick = (option) => {
+    setSelectedOption(option);
+    setIsMenuOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuOpenRef.current && !menuOpenRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
+
   return (
     <ContextProvider>
       <div className={`App ${isFullScreen ? "fullscreen" : ""}`} ref={appRef}>
         {isFullScreen ? (
-          <div className="fullscreen-nav">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="menu-btn"
-            >
-              <Menu size={24} />
-            </button>
+          <div className="fullscreen-nav" ref={menuOpenRef}>
+            {!isMenuOpen && (
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="menu-btn">
+                <Menu size={24} />
+              </button>
+            )}
             {isMenuOpen && (
               <div className="fullscreen-menu">
+                {currentView === "FeedPlayer" && (
+                  <div>
+                    <button onClick={() => handleMenuClick("feeds")}>
+                      <Check size={24} />
+                      <span>Choose Feeds</span>
+                    </button>
+                    <button onClick={() => handleMenuClick("url")}>
+                      <Link size={24} />
+                      <span>Paste Your Video URL</span>
+                    </button>
+                  </div>
+                )}
                 {renderNavItems()}
-                <button
-                  onClick={handleFullScreen}
-                  className="fullscreen-toggle"
-                >
+                <button onClick={handleFullScreen} className="fullscreen-toggle">
                   <Minimize size={24} />
                   <span>Exit Fullscreen</span>
                 </button>
@@ -410,11 +402,7 @@ function App() {
             <p>{error}</p>
           </div>
         )}
-        <main
-          className={`app-content ${isTransitioning ? "fade-out" : "fade-in"}`}
-        >
-          {renderContent()}
-        </main>
+        <main className={`app-content ${isTransitioning ? "fade-out" : "fade-in"}`}>{renderContent()}</main>
       </div>
     </ContextProvider>
   );

@@ -154,69 +154,6 @@
     max-width: 800px;
     margin: 0 auto;
   }
-  
-  .popup-container {
-    position: relative;
-  
-
-    .popup-btn {
-      position: absolute;
-      top: 10px;
-      right:10px;
-      z-index: 2000;
-      color: #fff;
-      background-color: rgba(0, 0, 0, 0.5);
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      padding: 10px;
-      font-size: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      svg {
-        width: 24px;
-        height: 24px;
-      }
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.7);
-      }
-    }
-
-    .popup-menu{
-      position: absolute;
-      top: 60px;
-      right: 0;
-      background-color: #fff;
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 10px;
-      min-width: 150px;
-      z-index: 200;
-
-          button {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 5px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-
-            &:hover {
-              background-color: #f0f0f0;
-            }
-
-            svg {
-              margin-right: 10px;
-            }
-          }
-    }
-  }
 
   .member-sense-container {
     width: 100%;
@@ -328,8 +265,8 @@
 
     .fullscreen-nav {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: 45px;
+      right: 10px;
       z-index: 2000;
 
       .menu-btn {
@@ -339,17 +276,14 @@
         font-size: 24px;
         cursor: pointer;
         padding: 10px;
-        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        border-radius: 0.5rem;
         background-color: rgba(0, 0, 0, 0.5);
         transition: background-color 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        svg {
-          width: 24px;
-          height: 24px;
-        }
 
         &:hover {
           background-color: rgba(0, 0, 0, 0.7);
@@ -358,13 +292,13 @@
 
       .fullscreen-menu {
         position: absolute;
-        top: 100%;
-        left: 0;
+        top: 50px;
+        right: 10px;
         background-color: #fff;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         padding: 10px;
-        min-width: 200px;
+        min-width: 205px;
 
         button {
           display: flex;
@@ -391,11 +325,6 @@
           color: #dc3545;
         }
       }
-    }
-
-    .feed-player-container {
-      max-width: none;
-      height: 100%;
     }
 
     .member-showcase-container,
