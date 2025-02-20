@@ -591,9 +591,9 @@ function VideoPlayer({
     const handleFullScreenChange = () => {
       setIsFullScreen(
         document.fullscreenElement ||
-          document.webkitFullscreenElement ||
-          document.mozFullScreenElement ||
-          document.msFullscreenElement
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
       );
     };
 
