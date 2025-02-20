@@ -9,7 +9,7 @@ export default function Popup({ setVideoList, setCurrentVideoSrc, setSelectedOpt
 
     setVideoList((prev) => [...prev, srcInputRef.current.value]);
     setCurrentVideoSrc(srcInputRef.current.value);
-    setSelectedOption(null);
+    setSelectedOption("");
   };
 
   async function validateVideoUrl(url) {
@@ -39,7 +39,7 @@ export default function Popup({ setVideoList, setCurrentVideoSrc, setSelectedOpt
 
   return (
     <>
-      <div className="Popup-wrapper" onClick={() => setSelectedOption(null)}>
+      <div className="Popup-wrapper" onClick={() => setSelectedOption("")}>
         <div className="Popup" onClick={(e) => e.stopPropagation()}>
           <h1>Paste your video URL</h1>
           <input type="text" placeholder="Enter video URL (should end with .mp4, .mkv, etc.)" ref={srcInputRef} />

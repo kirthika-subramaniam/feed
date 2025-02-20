@@ -7,8 +7,16 @@ import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
 import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 import Popup from "../components/Popup/Popup";
+import { Menu, Link, Check } from "lucide-react";
 
-function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFullScreen }) {
+function VideoPlayer({
+  autoplay = false,
+  isFullScreen,
+  setIsFullScreen,
+  handleFullScreen,
+  selectedOption,
+  setSelectedOption,
+}) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
   const { setVideoList, setCurrentVideoSrc } = useContext(VideoContext); // 0
@@ -39,10 +47,8 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
   const [isExpanded, setIsExpanded] = useState(false); // 23
   const menuRef = useRef(null); // 24
-
   const [isMenu, setIsMenu] = useState(false); // 25
-  const [selectedOption, setSelectedOption] = useState(null); // 26
-  const [swiperData, setSwiperData] = useState(null); // 27
+  const [swiperData, setSwiperData] = useState(null); // 26
 
   const imageDuration = 4;
 
@@ -61,7 +67,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
   };
 
   const handlePopupClick = () => {
-    setSelectedOption(null);
+    setSelectedOption("");
     setIsMenu(true);
     pause();
   };
@@ -230,7 +236,7 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
-        return swiperData; 
+        return swiperData;
       }
       const response = await axios.get(media.url);
       switch (media.feed.trim().toLowerCase()) {
@@ -694,25 +700,29 @@ function VideoPlayer({ autoplay = false, isFullScreen, setIsFullScreen, handleFu
             </div>
           </div>
         )}
-        <div className="VideoPlayer__toggleMenu" ref={menuRef}>
-          {!isMenu && (
-            <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
-              <i className="ri-more-2-line"></i>
-            </button>
-          )}
-          {isMenu && (
-            <div className="menu-content">
-              <ul className="menu-list">
-                <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
-                  Choose Feeds
-                </li>
-                <li className="menu-item" onClick={() => handleMenuClick("url")}>
-                  Paste Your Video URL
-                </li>
-              </ul>
-            </div>
-          )}
-        </div>
+        {!isFullScreen && (
+          <div className="VideoPlayer__toggleMenu" ref={menuRef}>
+            {!isMenu && (
+              <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
+                <Menu size={24} />
+              </button>
+            )}
+            {isMenu && (
+              <div className="menu-content">
+                <ul className="menu-list">
+                  <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
+                    <Check size={24} />
+                    <span>Choose Feeds</span>
+                  </li>
+                  <li className="menu-item" onClick={() => handleMenuClick("url")}>
+                    <Link size={24} />
+                    <span>Paste Your Video URL</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
         {selectedOption === "url" && <Popup {...{ setVideoList, setCurrentVideoSrc, setSelectedOption }} />}
         {selectedOption === "feeds" && (
           <div className="VideoPlayer__dropdown">
@@ -816,6 +826,8 @@ VideoPlayer.propTypes = {
   isFullScreen: PropTypes.bool.isRequired,
   setIsFullScreen: PropTypes.func.isRequired,
   handleFullScreen: PropTypes.func.isRequired,
+  selectedOption: PropTypes.string.isRequired,
+  setSelectedOption: PropTypes.func.isRequired,
 };
 
 export default VideoPlayer;

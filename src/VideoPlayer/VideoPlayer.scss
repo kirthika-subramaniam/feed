@@ -81,7 +81,7 @@
       right: 10px;
       z-index: 200;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      width: 12rem;
+      width: 14rem;
       border-radius: 0.375rem;
 
       .menu-list {
@@ -89,6 +89,9 @@
         list-style: none; 
     
         .menu-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           cursor: pointer;
           padding: 0.5rem; 
           border-bottom: 1px solid #e5e7eb;

@@ -155,21 +155,6 @@
     margin: 0 auto;
   }
 
-  // .popup-btn {
-  //   position: absolute;
-  //   top: 10px;
-  //   right: 10px;
-  //   z-index: 100;
-  //   background-color: white;
-  //   border: none;
-  //   border-radius: 0.5rem;
-  //   width: 50px;
-  //   height: 50px;
-  //   cursor: pointer;
-  //   box-shadow: 0px 0px 29px 0px #bebebe;
-  //   font-size: 1.5rem;
-  // }
-
   .member-sense-container {
     width: 100%;
     max-width: 400px;
@@ -280,8 +265,8 @@
 
     .fullscreen-nav {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: 45px;
+      right: 10px;
       z-index: 2000;
 
       .menu-btn {
@@ -291,17 +276,14 @@
         font-size: 24px;
         cursor: pointer;
         padding: 10px;
-        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        border-radius: 0.5rem;
         background-color: rgba(0, 0, 0, 0.5);
         transition: background-color 0.3s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        svg {
-          width: 24px;
-          height: 24px;
-        }
 
         &:hover {
           background-color: rgba(0, 0, 0, 0.7);
@@ -310,13 +292,13 @@
 
       .fullscreen-menu {
         position: absolute;
-        top: 100%;
-        left: 0;
+        top: 50px;
+        right: 10px;
         background-color: #fff;
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         padding: 10px;
-        min-width: 200px;
+        min-width: 205px;
 
         button {
           display: flex;
@@ -343,11 +325,6 @@
           color: #dc3545;
         }
       }
-    }
-
-    .feed-player-container {
-      max-width: none;
-      height: 100%;
     }
 
     .member-showcase-container,
