@@ -101,14 +101,8 @@
           const { index, url, title, explanation, source } = event.data;
           console.log("url: " + url + " , title: " + title + " , explanation: " + explanation);
           if ((source === "loop" || source === "feedmain") && !isNaN(index) && index > 0 && index <= 18) {
-            sessionStorage.setItem(
-              "swiperMedia",
-              JSON.stringify({
-                url: url,
-                text: explanation,
-                title: title,
-              })
-            );
+            sessionStorage.setItem("swiperMedia", JSON.stringify({ url: url, text: explanation, title: title }));
+            window.dispatchEvent(new Event('sessionStorageChange'));
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             const currentSwiperType = hashParams.get("swiper") || "default";
             history.replaceState(null, null, `#swiper=${currentSwiperType}&feed=nasa&scene=${index}`);

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
-import { Video, Users, MessageCircle, AlertCircle, Menu, Maximize, Minimize, Check, Link } from "lucide-react";
+import { Video, Users, MessageCircle, AlertCircle, MoreHorizontal, Maximize, Minimize, Check, Link } from "lucide-react";
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
@@ -46,9 +46,6 @@ function App() {
   const appRef = useRef(null);
   const [selectedOption, setSelectedOption] = useState("");
   const menuOpenRef = useRef(null);
-
-  // Feed player state
-  // const [isPopup, setIsPopup] = useState(false);
 
   // Auth state
   const [token, setToken] = useState("");
@@ -350,7 +347,7 @@ function App() {
           <div className="fullscreen-nav" ref={menuOpenRef}>
             {!isMenuOpen && (
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="menu-btn">
-                <Menu size={24} />
+                <MoreHorizontal size={24} />
               </button>
             )}
             {isMenuOpen && (
