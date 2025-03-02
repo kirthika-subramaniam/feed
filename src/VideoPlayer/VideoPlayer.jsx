@@ -7,7 +7,7 @@ import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
 import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 import Popup from "../components/Popup/Popup";
-import { Menu, Link, Check, MoreHorizontal } from "lucide-react";
+import { Link, Check, MoreHorizontal } from "lucide-react";
 
 function VideoPlayer({
   autoplay = false,
@@ -16,6 +16,8 @@ function VideoPlayer({
   handleFullScreen,
   selectedOption,
   setSelectedOption,
+  swiperData,
+  setSwiperData,
 }) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
@@ -48,7 +50,6 @@ function VideoPlayer({
   const [isExpanded, setIsExpanded] = useState(false); // 23
   const menuRef = useRef(null); // 24
   const [isMenu, setIsMenu] = useState(false); // 25
-  const [swiperData, setSwiperData] = useState(null); // 26
 
   const imageDuration = 4;
 
@@ -113,6 +114,7 @@ function VideoPlayer({
           url: swiperRepo.url,
           text: swiperRepo.text || "No description available",
           title: swiperRepo.title || swiperRepo.url.split("/").pop(),
+          mediaType: swiperRepo.mediaType || "image",
         });
       }
     };
@@ -128,8 +130,6 @@ function VideoPlayer({
       const swiperFeed = mediaList.find((media) => media.feed.trim().toLowerCase() === "swiper");
       if (swiperFeed) {
         await loadFeed(swiperFeed, templistofMedia);
-        setIndex(mediaList.indexOf(swiperFeed));
-        setActiveFeed("swiper");
         setLoadedFeeds(["swiper"]);
         setListofMedia(templistofMedia);
         setSelectedMediaList(templistofMedia[swiperFeed.title]);
@@ -203,9 +203,7 @@ function VideoPlayer({
     window.addEventListener("hashchange", handleHashChange);
     // Trigger on component mount
     handleHashChange();
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, [mediaList, listofMedia]);
 
   useEffect(() => {
@@ -852,6 +850,8 @@ VideoPlayer.propTypes = {
   handleFullScreen: PropTypes.func.isRequired,
   selectedOption: PropTypes.string.isRequired,
   setSelectedOption: PropTypes.func.isRequired,
+  swiperData: PropTypes.object.isRequired,
+  setSwiperData: PropTypes.func.isRequired,
 };
 
 export default VideoPlayer;

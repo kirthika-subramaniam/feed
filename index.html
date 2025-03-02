@@ -98,10 +98,10 @@
       // Function to handle messages from the iframe
       function handleMessage(event) {
         if (allowedOrigins.includes(event.origin)) {
-          const { index, url, title, explanation, source } = event.data;
-          console.log("url: " + url + " , title: " + title + " , explanation: " + explanation);
+          const { index, url, title, explanation, mediaType, source } = event.data;
+          console.log("url: " + url + " , title: " + title + " , explanation: " + explanation + ", mediaType: " + mediaType);
           if ((source === "loop" || source === "feedmain") && !isNaN(index) && index > 0 && index <= 18) {
-            sessionStorage.setItem("swiperMedia", JSON.stringify({ url: url, text: explanation, title: title }));
+            sessionStorage.setItem("swiperMedia", JSON.stringify({ url: url, text: explanation, title: title, mediaType: mediaType }));
             window.dispatchEvent(new Event('sessionStorageChange'));
             const hashParams = new URLSearchParams(window.location.hash.substring(1));
             const currentSwiperType = hashParams.get("swiper") || "default";
