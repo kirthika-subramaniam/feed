@@ -2,7 +2,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
-import { Video, Users, MessageCircle, AlertCircle, Menu, Maximize, Minimize, Check, Link } from "lucide-react";
+import {
+  Video,
+  Users,
+  MessageCircle,
+  AlertCircle,
+  MoreHorizontal,
+  Maximize,
+  Minimize,
+  Check,
+  Link,
+} from "lucide-react";
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
@@ -46,9 +56,8 @@ function App() {
   const appRef = useRef(null);
   const [selectedOption, setSelectedOption] = useState("");
   const menuOpenRef = useRef(null);
-
-  // Feed player state
-  // const [isPopup, setIsPopup] = useState(false);
+  const [swiperData, setSwiperData] = useState(null);
+  const [isPopup, setIsPopup] = useState(false);
 
   // Auth state
   const [token, setToken] = useState("");
@@ -105,6 +114,12 @@ function App() {
       setMessages([]);
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    if (swiperData) {
+      setIsPopup(true);
+    }
+  }, [swiperData]);
 
   useEffect(() => {
     if (sessionId && selectedChannel) {
@@ -268,6 +283,8 @@ function App() {
             handleFullScreen={handleFullScreen}
             selectedOption={selectedOption}
             setSelectedOption={setSelectedOption}
+            swiperData={swiperData}
+            setSwiperData={setSwiperData}
           />
         );
       case "MemberSense":
@@ -350,7 +367,7 @@ function App() {
           <div className="fullscreen-nav" ref={menuOpenRef}>
             {!isMenuOpen && (
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="menu-btn">
-                <Menu size={24} />
+                <MoreHorizontal size={24} />
               </button>
             )}
             {isMenuOpen && (
@@ -403,6 +420,16 @@ function App() {
           </div>
         )}
         <main className={`app-content ${isTransitioning ? "fade-out" : "fade-in"}`}>{renderContent()}</main>
+        {isPopup && (
+          <div className="lightbox" onClick={() => setIsPopup(null)}>
+            <button className="close-btn" onClick={() => setIsPopup(null)}>x</button>
+            {swiperData.mediaType === "video" ? (
+              <iframe className="lightboxImg" src={swiperData.url} alt="Enlarged Video" allowFullScreen />
+            ) : (
+              <img className="lightboxImg" src={swiperData.url} alt="Enlarged Image" />
+            )}
+          </div>
+        )}
       </div>
     </ContextProvider>
   );
