@@ -92,8 +92,14 @@ To contribute, fork our [four primary repos](https://github.com/ModelEarth?tab=r
       git clone https://github.com/[your account]/feed.git
       git clone https://github.com/[your account]/swiper.git
 
-Run the [start site command](/localsite/start/steps/) in your website root to view locally at [http://localhost:8887/feed](http://localhost:8887/feed) 
+Run the [start site command](https://dreamstudio.com/localsite/start/steps/) in your website root to view locally at [http://localhost:8887/feed](http://localhost:8887/feed) 
 
+      python -m http.server 8887
+
+### The primary FeedPlayer pages will be visible here:
+
+[FeedPlayer - localhost:8887/feed](http://localhost:8887/feed/)
+[Feed View - localhost:8887/feed/view](http://localhost:8887/feed/view/)
 
 ### Folders in your website root
 
@@ -111,17 +117,6 @@ website
    ├─ vite.config.js
    └─ .gitignore
 ```
-
-### Start a web server in your webroot
-
-```
-python -m http.server 8887
-```
-
-### The primary FeedPlayer pages will be visible here:
-
-[FeedPlayer - localhost:8887/feed](http://localhost:8887/feed/)
-[Feed View - localhost:8887/feed/view](http://localhost:8887/feed/view/)
 
 ## Edit and build the "feed" project locally
 
