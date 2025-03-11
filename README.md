@@ -1,4 +1,4 @@
-<h1 align='center'>Feed Player + Swiper - For Images, Video&nbsp;and&nbsp;Text</h1>
+<h1 align='center'>FeedPlayer + Swiper - For Images, Video&nbsp;and&nbsp;Text</h1>
 
 <!-- Image and link icon to https://video-player-sahilatahar.netlify.app
 
@@ -14,7 +14,7 @@ Welcome to our Feed-Player React Project! This project provides a modern and use
 
 ## Feed Samples
 
-[View Feeds](view) - The Feed Player is being designed to convert APIs, JSON and .CSV into video-like presentations.
+[View Feeds](view) - The FeedPlayer is being designed to convert APIs, JSON and .CSV into video-like presentations.
 [Bluesky RSS Feeds](view/#feed=bsky) - Click "Turn on CORS passthrough". &nbsp;[About Bluesky RSS](https://bsky.app/profile/todex.bsky.social/post/3kj2xcufu5q2q).
 
 [JSON for video, image and feed links](src/Data/data.js) - Feed APIs are loaded from a [Google Sheet](https://docs.google.com/spreadsheets/d/1jQTlXWom-pXvyP9zuTcbdluyvpb43hu2h7anxhF5qlQ/edit?usp=sharing)
@@ -35,39 +35,32 @@ DONE: Add columns for Title and Description in the Google Sheet - Matt B
 
 4.) DONE: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously. - Shreyas
 
-5.) IN PROGRESS: Membersense development and implementation using Discord API - Yunbo
+5.) DONE: Membersense development and initial implementation using Discord API - Yunbo
 
 <!-- 
 Let's revisit this for a modile orienation.
 DONE: Aspect ratio of video remains the same when showing landscape image.--><!--To prevent the video height from jumping short briefly: When setCurrentVideoSrc is called to advance the video, insert the current height until the next video loads. Remove the inserted height once the new slide video/image loads into the DOM. (The last video is an example with a different aspect ratio.)-->
 
-6.) IN PROGRESS: Use Vite to add [Swiper Element](https://swiperjs.com/element) in our "[swiper](https://github.com/modelearth/swiper)" repo and provide a filmstrip based on the images in incoming feeds. Place in a "swiper" folder. See [Swiper Element Setup](https://www.freecodecamp.org/news/how-to-set-up-swiper-element-in-a-react-application/) and [Film-strip sample](https://www.sliderrevolution.com/templates/wordpress-media-gallery) - We'll avoid showing multiple heros at the same time - Srinath
+6.) 
 
-7.) DONE: Load images into the Feed Player from our [pull from Github](../home/repo/). - Chethan
+7.) DONE: Load images into the FeedPlayer from our [pull from Github](../home/repo/). - Chethan
 Embed and show the FeedPlayer when choosing "images" at [/home/repo/](../home/repo/)
 
-8.) DONE: Pull NASA feed into React Feed Player and show images. - Noopur
+8.) DONE: Pull NASA feed into React FeedPlayer and show images. - Noopur
 
-9.) TO DO: In Javascript feed/view page, pull in multiple Bluesky RSS feed links by passing in a pipe | separated list of feed urls. Add loop when pipes found in the url value in both JQuery feed/view - Noopur : Done
+9a.) DONE: In Javascript feed/view page, pull in multiple Bluesky RSS feed links by passing in a pipe | separated list of feed urls. Add loop when pipes found in the url value in both JQuery feed/view - Noopur
 
-10.) In React Feed Player, using [Feeds tab CSV pull from Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSxfv7lxikjrmro3EJYGE_134vm5HdDszZKt4uKswHhsNJ_-afSaG9RoA4oeNV656r4mTuG3wTu38pM/pub?gid=889452679&single=true&output=csv), split on the pipe in the React Feed Player. - Noopur
+9b.) TO DO: Check if pipeseperated works for any multi-feed pull. Update if need and update documentation.
 
-11.) TO DO: Pull the replies for each Bluesky post in the feed. Use the screen-grab technique that we use to grab images from news sites that are listed in the feed. Scrape the posts from the Bluesky website. Grab replies for the top 3 posts. If the process doesn't work, leave the attempt commented out. - Noopur
+10.) In React FeedPlayer, using [Feeds tab CSV pull from Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSxfv7lxikjrmro3EJYGE_134vm5HdDszZKt4uKswHhsNJ_-afSaG9RoA4oeNV656r4mTuG3wTu38pM/pub?gid=889452679&single=true&output=csv), split on the pipe in the React FeedPlayer. - Noopur
+
+11.) IN PROGRESS: Pull the replies for each Bluesky post in the feed. Use the screen-grab technique that we use to grab images from news sites that are listed in the feed. Scrape the posts from the Bluesky website. Grab replies for the top 3 posts. If the process doesn't work, leave the attempt commented out. <!-- Noopur initially. This process worked initially on view page. Maybe Bluesky changed something? -->
 
 12.) DONE: List of feeds on right of player with links to /feed/view/#feed= - Kalyan
 
-13.) Hide the "link icon" in the upper right unless a video is being viewed. - Jashwanth
+13.) DONE: Hide the "link icon" in the upper right unless a video is being viewed. - Jashwanth<!-- confirm-->
 
-### Building Transparency
-
-11.) TO DO: Update javascript in this Building Transparency [template page](/io/template/feed) to allow an API token to be pasted into the "Your API Key" field.
-
-12.) TO DO: Create a Python process using Github Actions that automatically pulls a new Building Transparency API token every 24 hours. See our existing Python for sample of refreshing the API using a username (email) and password.
-
-13.) Supabase integration - Add a process for saving posts, links and comments related to feed items in Supabase within the [Earthscape NextJS repo](../earthscape/app). Save the ids of the RSS feed item hierarchy from BlueSky and relate it to threaded replies.
-
-
-1.) TO DO: Update the Yarn Build to make the player an embeddable widget. Here's possible <a href="https://chatgpt.com/share/b847e2c7-732b-4f28-b069-7a58bc107d93">setup info in ChatGPT</a>.
+14.) DONE: Update Vite to make the player an embeddable widget. - Loren
 
 In the existing code, we tried to automate copying the index-xxxxxxxx.js and index-xxxxxxxx.css files to feedplayer.js and feedplayer.css within [dist/assets](https://github.com/ModelEarth/feed/tree/main/dist/assets).  We replaced vite.config.js with vite.config-upcoming.js, but it's not working yet (the copy might run before the build completes).  Once generating a consistant .js and .css file name, edit feed/intro.html to use feedplayer.js and feedplayer.css (or whatever .js file name is standard for a Vite widget).  Also adjust so the widget can be played on the main feed/index.html page. Marco shared a link to [How to copy images in DIST folder from assets in Vite js](https://stackoverflow.com/questions/78076268/how-to-copy-images-in-dist-folder-from-assets-in-vite-js)
 
@@ -80,7 +73,7 @@ In the existing code, we tried to automate copying the index-xxxxxxxx.js and ind
 🔊 &nbsp; Volume Control: Adjust the volume level to your preference by increasing or decreasing the volume.  
 🔇 &nbsp; Mute: Quickly mute or unmute the feed's audio with the mute button.  
 &#9970; &nbsp; Full-Screen: Enjoy your videos in full-screen mode for an immersive viewing experience.  
-&#9202; &nbsp; Remaining Time: The feed player will display the remaining time of the current feed.  
+&#9202; &nbsp; Remaining Time: The FeedPlayer will display the remaining time of the current feed.  
 &#9654; &nbsp;Navigation: Seamlessly navigate to the next or previous item in the playlist.  
 &#128250; &nbsp; Play by URL: Paste a feed URL to play any valid feed format directly from the web. (Coming soon)
 
@@ -122,7 +115,7 @@ python -m http.server 8887
 
 ### The primary FeedPlayer pages will be visible here:
 
-[Feed Player - localhost:8887/feed](http://localhost:8887/feed/)
+[FeedPlayer - localhost:8887/feed](http://localhost:8887/feed/)
 [Feed View - localhost:8887/feed/view](http://localhost:8887/feed/view/)
 
 ## Edit and build the "feed" project locally
@@ -177,7 +170,7 @@ yarn dev
 Or you can skip "yarn dev" and view at [http://localhost:8887/feed/dist](http://localhost:8887/feed/dist)
 
 <!--
-Since we might include /feed in the base path, the feed player may not always work at: [localhost:5173/dist](http://localhost:5173/dist/)
+Since we might include /feed in the base path, the FeedPlayer may not always work at: [localhost:5173/dist](http://localhost:5173/dist/)
 -->
 
 ### 4. Build the app to the dist folder
@@ -231,6 +224,6 @@ which means you are free to use, modify, and distribute the code as you see fit.
 We hope you enjoy using the Feed-Player!
 
 If you have any questions, requests or feedback, please post an issue in our
-[Feed Player repo](http://github.com/modelearth/feed) or the parent [Video Player repo](https://github.com/sahilatahar/Video-Player).
+[FeedPlayer repo](http://github.com/modelearth/feed) or the parent [Video Player repo](https://github.com/sahilatahar/Video-Player).
 
 Happy feed viewing! 🎥🍿
