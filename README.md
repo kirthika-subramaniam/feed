@@ -86,7 +86,14 @@ The Feed-Player interface that is both visually appealing and intuitive to use. 
 
 ## Getting Started
 
-To contribute, fork our [four primary repos](https://github.com/ModelEarth?tab=repositories) and clone into your webroot using Github Desktop. If you're NOT making code updates, you can clone without forking using these commands:
+To contribute, fork these 3 repos (and sync often):
+[localsite](https://github.com/ModelEarth/localsite)
+[feed](https://github.com/ModelEarth/feed)
+[swiper](https://github.com/ModelEarth/swiper)
+
+Then clone into your website root using Github Desktop.
+
+If you're NOT making code updates, you can clone without forking using these commands:
 
       git clone https://github.com/[your account]/localsite.git
       git clone https://github.com/[your account]/feed.git
@@ -99,7 +106,7 @@ Run the [start site command](https://dreamstudio.com/localsite/start/steps/) in 
 ### The primary FeedPlayer pages will be visible here:
 
 [FeedPlayer - localhost:8887/feed](http://localhost:8887/feed/)
-[Feed View - localhost:8887/feed/view](http://localhost:8887/feed/view/)
+[Feed API View - localhost:8887/feed/view](http://localhost:8887/feed/view/)
 
 ### Folders in your website root
 
