@@ -33,27 +33,29 @@ Place your name here if you're working on an update.
 DONE: Add columns for Title and Description in the Google Sheet - Matt B
 -->
 
-3.) DONE: New swiper control and text that scrolls in player.  - Shreyas
+3.) DONE: New swiper control and text that scrolls in player. - Shreyas
 
-4.) DONE: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously. - Shreyas
+4.) TO DO: When an image is narrower than the player, span 100% while retaining the image's ratio. Have the image slowly pan from the top to bottom when portions of it exceed the player height.
 
-5.) DONE: Membersense development and initial implementation using Discord API - Yunbo
+5.) DONE: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously. - Shreyas
+
+6.) DONE: Membersense development and initial implementation using Discord API - Yunbo
 
 <!-- 
 Let's revisit this for a modile orienation.
 DONE: Aspect ratio of video remains the same when showing landscape image.--><!--To prevent the video height from jumping short briefly: When setCurrentVideoSrc is called to advance the video, insert the current height until the next video loads. Remove the inserted height once the new slide video/image loads into the DOM. (The last video is an example with a different aspect ratio.)-->
 
-6.) 
+7.) TO DO: When reloading retain feed's hash in the URL, and display that feed.
+To see bug, hit refresh for the following or load the link directly: 
+[Hash example for SeeClickFix](#feed=seeclickfix-311) - the hash values currently disappear when reloading.
 
-7.) DONE: Load images into the FeedPlayer from our [pull from Github](../home/repo/). - Chethan
+8.) DONE: Load images into the FeedPlayer from our [pull from Github](../home/repo/). - Chethan
 
-8.) DONE: Pull NASA feed into React FeedPlayer and show images. - Noopur
+9.) DONE: Pull NASA feed into React FeedPlayer and show images. - Noopur
 
-9a.) DONE: In Javascript feed/view page, pull in multiple Bluesky RSS feed links by passing in a pipe | separated list of feed urls. Add loop when pipes found in the url value in both JQuery feed/view - Noopur
+10a.) DONE: In Javascript feed/view page, pull in multiple Bluesky RSS feed links by passing in a pipe | separated list of feed urls. Add loop when pipes found in the url value in both JQuery feed/view - Noopur
 
-9b.) TO DO: Check if pipeseperated works for any multi-feed pull. Update if need and update documentation.
-
-10.) In React FeedPlayer, using [Feeds tab CSV pull from Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSxfv7lxikjrmro3EJYGE_134vm5HdDszZKt4uKswHhsNJ_-afSaG9RoA4oeNV656r4mTuG3wTu38pM/pub?gid=889452679&single=true&output=csv), split on the pipe in the React FeedPlayer. - Noopur
+10b.) TO DO: Check if pipeseperated works for any multi-feed pull [from our Google Sheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vSxfv7lxikjrmro3EJYGE_134vm5HdDszZKt4uKswHhsNJ_-afSaG9RoA4oeNV656r4mTuG3wTu38pM/pub?gid=889452679&single=true&output=csv) splits on pipes in the React FeedPlayer to append multiple APIs. Update code if need and update documentation.
 
 11.) IN PROGRESS: Pull the replies for each Bluesky post in the feed. Use the screen-grab technique that we use to grab images from news sites that are listed in the feed. Scrape the posts from the Bluesky website. Grab replies for the top 3 posts. If the process doesn't work, leave the attempt commented out. <!-- Noopur initially. This process worked initially on view page. Maybe Bluesky changed something? -->
 
@@ -84,12 +86,14 @@ The Feed-Player interface that is both visually appealing and intuitive to use. 
 
 ## Getting Started
 
-To contribute, fork our [four primary repos](https://github.com/ModelEarth?tab=repositories) and clone into your webroot:
+To contribute, fork our [four primary repos](https://github.com/ModelEarth?tab=repositories) and clone into your webroot using Github Desktop. If you're NOT making code updates, you can clone without forking using these commands:
 
       git clone https://github.com/[your account]/localsite.git
       git clone https://github.com/[your account]/feed.git
       git clone https://github.com/[your account]/swiper.git
-      git clone https://github.com/[your account]/home.git
+
+Run the [start site command](/localsite/start/steps/) in your website root to view locally at [http://localhost:8887/feed](http://localhost:8887/feed) 
+
 
 ### Folders in your website root
 
