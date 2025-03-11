@@ -5,19 +5,21 @@
 [![video-player](https://github.com/sahilatahar/Video-Player/assets/100127570/8315e5d3-9b16-4b37-a50c-141a96f2e72e)](https://video-player-sahilatahar.netlify.app/)
 -->
 
-Welcome to our Feed-Player React Project! This project provides a modern and user-friendly interface for viewing a series of images and video pulled from RSS, JSON, CSV and YAML. The UI is built using Vite, ReactJS, HTML, CSS, and JavaScript. The Feed-Player is designed to be fully responsive and packed with a range of features to enhance your viewing experience with filmstrip navigation using [swiper](https://github.com/modelearth/swiper).
+Welcome to our FeedPlayer React Project! This project provides a modern and user-friendly interface for viewing a series of images and video pulled from RSS, JSON, CSV and YAML. The UI is built using Vite, ReactJS, HTML, CSS, and JavaScript. The Feed-Player is designed to be fully responsive and packed with a range of features to enhance your viewing experience with filmstrip navigation using [swiper](https://github.com/modelearth/swiper).
 
 <!-- https://video-player-sahilatahar.netlify.app -->
 
 <!-- [Check out the Live Preview](intro.html) -->
-[Check out the FeedPlayer](https://model.earth/feed/) on model.earth.
+[Check out the FeedPlayer](https://dreamstudio.com/feed/) and [Swiper](https://dreamstudio.com/home/) on DreamStudio.com.
 
 ## Feed Samples
 
-[View Feeds](view) - The FeedPlayer is being designed to convert APIs, JSON and .CSV into video-like presentations.
+[Our FeedPlayer Google Sheet](https://docs.google.com/spreadsheets/d/1jQTlXWom-pXvyP9zuTcbdluyvpb43hu2h7anxhF5qlQ/edit?usp=sharing) provides the APIs loaded. 
+[View the feed json directly](view) - The FeedPlayer is being designed to convert APIs, JSON and .CSV into video-like presentations.
 [Bluesky RSS Feeds](view/#feed=bsky) - Click "Turn on CORS passthrough". &nbsp;[About Bluesky RSS](https://bsky.app/profile/todex.bsky.social/post/3kj2xcufu5q2q).
 
-[JSON for video, image and feed links](src/Data/data.js) - Feed APIs are loaded from a [Google Sheet](https://docs.google.com/spreadsheets/d/1jQTlXWom-pXvyP9zuTcbdluyvpb43hu2h7anxhF5qlQ/edit?usp=sharing)
+<!-- [JSON for video, image and feed links](src/Data/data.js) -->
+
 
 ## Team Projects
 
@@ -44,7 +46,6 @@ DONE: Aspect ratio of video remains the same when showing landscape image.--><!-
 6.) 
 
 7.) DONE: Load images into the FeedPlayer from our [pull from Github](../home/repo/). - Chethan
-Embed and show the FeedPlayer when choosing "images" at [/home/repo/](../home/repo/)
 
 8.) DONE: Pull NASA feed into React FeedPlayer and show images. - Noopur
 
