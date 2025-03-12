@@ -164,7 +164,7 @@ function App() {
       setServerInfo({
         serverName: "Mocking Discord Server",
         memberCount: 1500,
-        iconURL: "https://via.placeholder.com/48",
+        //iconURL: "https://via.placeholder.com/48",
       });
       setIsLoading(false);
       return true;
