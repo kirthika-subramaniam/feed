@@ -62,7 +62,8 @@ const generateFakeMembers = (num) => {
   return Array.from({ length: num }, (_, i) => ({
     id: i + 1,
     username: `${names[i % names.length]} ${i + 1}`,
-    avatar: `https://via.placeholder.com/150?text=${names[i % names.length]}`,
+    //avatar: `https://via.placeholder.com/150?text=${names[i % names.length]}`,
+    avatar: `/localsite/img/logo/earth/model-earth.png`,
     email: i % 2 === 0 
       ? `${names[i % names.length].toLowerCase()}${i + 1}@example.com`
       : null,

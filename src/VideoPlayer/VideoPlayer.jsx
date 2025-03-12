@@ -672,7 +672,7 @@ function VideoPlayer({
           )
         ) : (
           <div className="VideoPlayer__no-media">
-            <p>No media available</p>
+            <p>No media available (You may have exceeded the maximum.)</p>
           </div>
         )}
         <div
