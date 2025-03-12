@@ -236,13 +236,16 @@ const MemberSense = ({
                   How to Get My Team&apos;s Token?
                 </a>
               </div>
+              <div>
+                View Sample Discord Team and Posts
+              </div>
               <div className="permissions-info">
                 <h4>Required Bot Permissions:</h4>
                 <ul>
-                  <li>Read Messages/View Channels</li>
+                  <li>View Channels</li>
+                  <li>View Server Insights</li>
                   <li>Send Messages</li>
                   <li>Read Message History</li>
-                  <li>View Server Insights</li>
                 </ul>
               </div>
             </>

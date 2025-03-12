@@ -67,7 +67,7 @@ function App() {
   const [serverInfo, setServerInfo] = useState(null);
 
   // Data state
-  const [useMockData, setUseMockData] = useState(true);
+  const [useMockData, setUseMockData] = useState(false);
   const [members, setMembers] = useState([]);
   const [channels, setChannels] = useState([]);
   const [messages, setMessages] = useState([]);
