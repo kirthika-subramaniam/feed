@@ -7,7 +7,7 @@ import axios from "axios"; //To fetch the urls of the API
 import PropTypes from "prop-types";
 import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 import Popup from "../components/Popup/Popup";
-import { Menu, Link, Check } from "lucide-react";
+import { Link, Check, MoreHorizontal } from "lucide-react";
 
 function VideoPlayer({
   autoplay = false,
@@ -16,6 +16,8 @@ function VideoPlayer({
   handleFullScreen,
   selectedOption,
   setSelectedOption,
+  swiperData,
+  setSwiperData,
 }) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
@@ -48,7 +50,6 @@ function VideoPlayer({
   const [isExpanded, setIsExpanded] = useState(false); // 23
   const menuRef = useRef(null); // 24
   const [isMenu, setIsMenu] = useState(false); // 25
-  const [swiperData, setSwiperData] = useState(null); // 26
 
   const imageDuration = 4;
 
@@ -113,12 +114,31 @@ function VideoPlayer({
           url: swiperRepo.url,
           text: swiperRepo.text || "No description available",
           title: swiperRepo.title || swiperRepo.url.split("/").pop(),
+          mediaType: swiperRepo.mediaType || "image",
         });
       }
     };
-
-    fetchSwiperData();
+    const handleStorageChange = () => fetchSwiperData();
+    window.addEventListener("sessionStorageChange", handleStorageChange);
+    return () => window.removeEventListener("sessionStorageChange", handleStorageChange);
   }, []);
+
+  useEffect(() => {
+    const processSwiperData = async () => {
+      setIsLoading(true);
+      const templistofMedia = {};
+      const swiperFeed = mediaList.find((media) => media.feed.trim().toLowerCase() === "swiper");
+      if (swiperFeed) {
+        await loadFeed(swiperFeed, templistofMedia);
+        setLoadedFeeds(["swiper"]);
+        setListofMedia(templistofMedia);
+        setSelectedMediaList(templistofMedia[swiperFeed.title]);
+        setCurrentMedia(templistofMedia[swiperFeed.title][0]);
+      }
+      setIsLoading(false);
+    };
+    processSwiperData();
+  }, [swiperData]);
 
   useEffect(() => {
     const { feed, ref } = parseHash();
@@ -183,9 +203,7 @@ function VideoPlayer({
     window.addEventListener("hashchange", handleHashChange);
     // Trigger on component mount
     handleHashChange();
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, [mediaList, listofMedia]);
 
   useEffect(() => {
@@ -236,7 +254,11 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
-        return swiperData;
+        return {
+          url: swiperData.url,
+          text: swiperData.text || "No description available",
+          title: swiperData.title,
+        };
       }
       const response = await axios.get(media.url);
       switch (media.feed.trim().toLowerCase()) {
@@ -591,9 +613,9 @@ function VideoPlayer({
     const handleFullScreenChange = () => {
       setIsFullScreen(
         document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement ||
+          document.msFullscreenElement
       );
     };
 
@@ -650,7 +672,7 @@ function VideoPlayer({
           )
         ) : (
           <div className="VideoPlayer__no-media">
-            <p>No media available</p>
+            <p>No media available (You may have exceeded the maximum.)</p>
           </div>
         )}
         <div
@@ -704,7 +726,7 @@ function VideoPlayer({
           <div className="VideoPlayer__toggleMenu" ref={menuRef}>
             {!isMenu && (
               <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
-                <Menu size={24} />
+                <MoreHorizontal size={24} />
               </button>
             )}
             {isMenu && (
@@ -828,6 +850,8 @@ VideoPlayer.propTypes = {
   handleFullScreen: PropTypes.func.isRequired,
   selectedOption: PropTypes.string.isRequired,
   setSelectedOption: PropTypes.func.isRequired,
+  swiperData: PropTypes.object.isRequired,
+  setSwiperData: PropTypes.func.isRequired,
 };
 
 export default VideoPlayer;
