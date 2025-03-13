@@ -670,7 +670,7 @@ function VideoPlayer({
           )
         ) : (
           <div className="VideoPlayer__no-media">
-            <p>No media available</p>
+            <p>No media available (You may have exceeded the maximum.)</p>
           </div>
         )}
         {selectedMediaList.length > 1 && (
@@ -792,7 +792,7 @@ function VideoPlayer({
                 min={0}
               />
               <span className="time">
-                {currentTime[0]}:{currentTime[1]} / {duration[0]}:{duration[1]}
+                {currentTime[0]}:{String(currentTime[1]).padStart(2,"0")} / {duration[0]}:{String(duration[1]).padStart(2,"0")}
               </span>
             </>
           )}

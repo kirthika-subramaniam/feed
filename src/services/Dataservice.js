@@ -62,7 +62,7 @@ const generateFakeMembers = (num) => {
   return Array.from({ length: num }, (_, i) => ({
     id: i + 1,
     username: `${names[i % names.length]} ${i + 1}`,
-    avatar: `https://via.placeholder.com/150?text=${names[i % names.length]}`,
+    avatar: `https://i.pravatar.cc/150?img=${(i+1)%names.length}`,
     email: i % 2 === 0 
       ? `${names[i % names.length].toLowerCase()}${i + 1}@example.com`
       : null,
@@ -90,10 +90,10 @@ const generateFakeChannels = (num) => {
  */
 const generateFakeMessages = (num, channelId) => {
   const users = [
-    { id: "user1", name: "Alice", avatar: "https://via.placeholder.com/40?text=A" },
-    { id: "user2", name: "Bob", avatar: "https://via.placeholder.com/40?text=B" },
-    { id: "user3", name: "Charlie", avatar: "https://via.placeholder.com/40?text=C" },
-    { id: "user4", name: "David", avatar: "https://via.placeholder.com/40?text=D" },
+    { id: "user1", name: "Alice", avatar: 'https://i.pravatar.cc/150?img=1' },
+    { id: "user2", name: "Bob", avatar: 'https://i.pravatar.cc/150?img=2' },
+    { id: "user3", name: "Charlie", avatar: 'https://i.pravatar.cc/150?img=3'},
+    { id: "user4", name: "David", avatar: 'https://i.pravatar.cc/150?img=4' },
   ];
 
   return Array.from({ length: num }, (_, i) => {

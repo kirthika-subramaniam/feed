@@ -69,7 +69,7 @@ function App() {
   const [serverInfo, setServerInfo] = useState(null);
 
   // Data state
-  const [useMockData, setUseMockData] = useState(true);
+  const [useMockData, setUseMockData] = useState(false);
   const [members, setMembers] = useState([]);
   const [channels, setChannels] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -200,7 +200,7 @@ function App() {
       setServerInfo({
         serverName: "Mocking Discord Server",
         memberCount: 1500,
-        iconURL: "https://via.placeholder.com/48",
+        //iconURL: "https://via.placeholder.com/48",
       });
       setIsLoading(false);
       return true;

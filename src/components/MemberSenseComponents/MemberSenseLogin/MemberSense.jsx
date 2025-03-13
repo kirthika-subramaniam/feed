@@ -223,6 +223,34 @@ const MemberSense = ({
         }`}
       >
         <h1 className="member-sense-title">MemberSense</h1>
+
+        {!serverInfo && !useMockData && (
+            <>
+              <div className="token-info">
+                <a
+                  href="https://github.com/ModelEarth/feed/blob/main/MemberSense.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="token-link"
+                >
+                  How to Get My Team&apos;s Token?
+                </a>
+              </div>
+              <div>
+                View Sample Discord Team and Posts
+              </div>
+              <div className="permissions-info">
+                <h4>Required Bot Permissions:</h4>
+                <ul>
+                  <li>View Channels</li>
+                  <li>View Server Insights</li>
+                  <li>Send Messages</li>
+                  <li>Read Message History</li>
+                </ul>
+              </div>
+            </>
+        )}
+
         {!isLoggedIn && renderDataModeToggle()}
         {parentLoading ? (
           <div className="loading-container">
@@ -247,29 +275,7 @@ const MemberSense = ({
               </div>
             )}
 
-            {!serverInfo && !useMockData && (
-              <>
-                <div className="token-info">
-                  <a
-                    href="https://github.com/ModelEarth/feed/blob/main/MemberSense.md"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="token-link"
-                  >
-                    How to Get My Team&apos;s Token?
-                  </a>
-                </div>
-                <div className="permissions-info">
-                  <h4>Required Bot Permissions:</h4>
-                  <ul>
-                    <li>Read Messages/View Channels</li>
-                    <li>Send Messages</li>
-                    <li>Read Message History</li>
-                    <li>View Server Insights</li>
-                  </ul>
-                </div>
-              </>
-            )}
+            
           </>
         )}
         {(isValidating || isLoggingOut) && (
