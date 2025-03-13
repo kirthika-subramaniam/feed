@@ -3,7 +3,7 @@ import { Context } from "../Context/ContextGoogle";
 import { VideoContext } from "../Context/Context";
 import { formatTime } from "../utils/formatTime";
 import "./VideoPlayer.scss";
-import axios from "axios"; //To fetch the urls of the API
+import axios from "axios";
 import PropTypes from "prop-types";
 import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 import Popup from "../components/Popup/Popup";
@@ -48,8 +48,6 @@ function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
   const [isExpanded, setIsExpanded] = useState(false); // 23
-  const menuRef = useRef(null); // 24
-  const [isMenu, setIsMenu] = useState(false); // 25
 
   const imageDuration = 4;
 
@@ -67,31 +65,31 @@ function VideoPlayer({
     };
   };
 
-  const handlePopupClick = () => {
-    setSelectedOption("");
-    setIsMenu(true);
-    pause();
-  };
+  // const handlePopupClick = () => {
+  //   setSelectedOption("");
+  //   setIsMenu(true);
+  //   pause();
+  // };
 
-  const handleMenuClick = (option) => {
-    setIsMenu(false);
-    setSelectedOption(option);
-    play();
-  };
+  // const handleMenuClick = (option) => {
+  //   setIsMenu(false);
+  //   setSelectedOption(option);
+  //   play();
+  // };
 
-  // Click outside to close the menu
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      // If menuRef exists and the click is NOT inside it, close the menu
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenu(false);
-        play();
-      }
-    };
+  // // Click outside to close the menu
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     // If menuRef exists and the click is NOT inside it, close the menu
+  //     if (menuRef.current && !menuRef.current.contains(event.target)) {
+  //       setIsMenu(false);
+  //       play();
+  //     }
+  //   };
 
-    if (isMenu) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenu]);
+  //   if (isMenu) document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, [isMenu]);
 
   useEffect(() => {
     if (currentMedia && selectedMediaList.length > 0) updateURLHash(mediaList[index].feed, currentMediaIndex);
@@ -675,40 +673,42 @@ function VideoPlayer({
             <p>No media available</p>
           </div>
         )}
-        <div
-          className="VideoPlayer__progress-bg"
-          onClick={(event) => handleProgressBarClick(event)}
-          style={{ bottom: isFullScreen ? "12px" : 0 }}
-        >
+        {selectedMediaList.length > 1 && (
           <div
-            className="VideoPlayer__progress"
-            style={{
-              width:
-                selectedMediaList.length > 0
-                  ? `${
-                      ((currentMediaIndex + 1) / (selectedMediaList.length < 7 ? selectedMediaList.length : 7)) * 100
-                    }%`
-                  : "0%",
-            }}
-          ></div>
-          {selectedMediaList.slice(0, 7).map(
-            (item, index) =>
-              index >= 0 && (
-                <div
-                  key={index}
-                  className="VideoPlayer__progress-point"
-                  style={{
-                    left: `${((index + 1) / (selectedMediaList.length < 7 ? selectedMediaList.length : 7)) * 99.75}%`,
-                  }}
-                  title={`Move to slide ${index + 1}`}
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent the progress bar click handler from triggering
-                    moveToSlide(index);
-                  }}
-                ></div>
-              )
-          )}
-        </div>
+            className="VideoPlayer__progress-bg"
+            onClick={(event) => handleProgressBarClick(event)}
+            style={{ bottom: isFullScreen ? "12px" : 0 }}
+          >
+            <div
+              className="VideoPlayer__progress"
+              style={{
+                width:
+                  selectedMediaList.length > 0
+                    ? `${
+                        ((currentMediaIndex + 1) / (selectedMediaList.length < 7 ? selectedMediaList.length : 7)) * 100
+                      }%`
+                    : "0%",
+              }}
+            ></div>
+            {selectedMediaList.slice(0, 7).map(
+              (item, index) =>
+                index >= 0 && (
+                  <div
+                    key={index}
+                    className="VideoPlayer__progress-point"
+                    style={{
+                      left: `${((index + 1) / (selectedMediaList.length < 7 ? selectedMediaList.length : 7)) * 99.75}%`,
+                    }}
+                    title={`Move to slide ${index + 1}`}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the progress bar click handler from triggering
+                      moveToSlide(index);
+                    }}
+                  ></div>
+                )
+            )}
+          </div>
+        )}
         {!isLoading && currentMedia && (
           <div className={`VideoPlayer__overlay ${isExpanded ? "expanded-overlay" : ""}`}>
             <div className="VideoPlayer__info">
@@ -720,29 +720,6 @@ function VideoPlayer({
               </h2>
               <p className={isExpanded ? "expanded" : "collapsed"}>{currentMedia.text || "No description available"}</p>
             </div>
-          </div>
-        )}
-        {!isFullScreen && (
-          <div className="VideoPlayer__toggleMenu" ref={menuRef}>
-            {!isMenu && (
-              <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
-                <MoreHorizontal size={24} />
-              </button>
-            )}
-            {isMenu && (
-              <div className="menu-content">
-                <ul className="menu-list">
-                  <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
-                    <Check size={24} />
-                    <span>Choose Feeds</span>
-                  </li>
-                  <li className="menu-item" onClick={() => handleMenuClick("url")}>
-                    <Link size={24} />
-                    <span>Paste Your Video URL</span>
-                  </li>
-                </ul>
-              </div>
-            )}
           </div>
         )}
         {selectedOption === "url" && <Popup {...{ setVideoList, setCurrentVideoSrc, setSelectedOption }} />}
