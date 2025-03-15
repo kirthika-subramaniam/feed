@@ -59,6 +59,7 @@
       border: none;
       padding: 0.5rem;
       font-size: 1rem;
+      color: black;
       cursor: pointer;
       transition: all 0.3s ease;
 
@@ -222,6 +223,7 @@
         align-items: center;
         gap: 8px;
         cursor: pointer;
+        color: black;
         padding: 0.5rem; 
         &:hover {
           background-color: #f3f4f6;

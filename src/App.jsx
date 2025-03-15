@@ -2,17 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
-import {
-  Video,
-  Users,
-  MessageCircle,
-  AlertCircle,
-  MoreHorizontal,
-  Maximize,
-  Minimize,
-  Check,
-  Link,
-} from "lucide-react";
+import { Video, Users, MessageCircle, AlertCircle, MoreHorizontal, Maximize, Minimize, Link, List } from "lucide-react";
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
@@ -103,7 +93,7 @@ function App() {
   }, [isMenu]);
 
   useEffect(() => {
-    if(isMenu) setIsMenu(false);
+    if (isMenu) setIsMenu(false);
   }, [currentView]);
 
   // Effects
@@ -364,20 +354,22 @@ function App() {
       ...(token ? memberSenseDropdownItems : []),
     ];
 
-    return items.map((item) => (
-      <button
-        key={item.id}
-        onClick={() => {
-          handleViewChange(item.id);
-          if (isFullScreen) setIsMenuOpen(false);
-        }}
-        className={currentView === item.id ? "active" : ""}
-        title={item.label}
-      >
-        <item.icon size={24} />
-        <span>{item.label}</span>
-      </button>
-    ));
+    return items
+      .filter((item) => item.id !== currentView)
+      .map((item) => (
+        <button
+          key={item.id}
+          onClick={() => {
+            handleViewChange(item.id);
+            if (isFullScreen) setIsMenuOpen(false);
+          }}
+          className={currentView === item.id ? "active" : ""}
+          title={item.label}
+        >
+          <item.icon size={24} />
+          <span>{item.label}</span>
+        </button>
+      ));
   };
 
   return (
@@ -395,7 +387,7 @@ function App() {
                 {currentView === "FeedPlayer" && (
                   <div>
                     <button onClick={() => handleMenuClick("feeds")}>
-                      <Check size={24} />
+                      <List size={24} />
                       <span>Choose Feeds</span>
                     </button>
                     <button onClick={() => handleMenuClick("url")}>
@@ -438,7 +430,7 @@ function App() {
                   {currentView === "FeedPlayer" && (
                     <>
                       <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
-                        <Check size={24} />
+                        <List size={24} />
                         <span>Choose Feeds</span>
                       </li>
                       <li className="menu-item" onClick={() => handleMenuClick("url")}>
