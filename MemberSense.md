@@ -31,8 +31,7 @@ To use the MemberSense Discord Integration in production mode, you need to set u
 2. Click on "New Application" and give your application a name.
 3. Click the "Bot" tab in the left sidebar. Click "Add Bot" if you don't have one yet.
 4. Under the bot's username, click "Copy" to copy your bot token. Keep this token secret and secure.
-5. Scroll down to the "Privileged Gateway Intents" section and enable "Server Members Intent".
-
+5. Scroll down to the "Privileged Gateway Intents" section and enable all the checkboxes ("Presence Intent", "Server Members Intent" and "Message Content Intent").
 6. To invite the bot to your server, go to the "OAuth2" tab in the left sidebar.
 7. In the "Scopes" section, select "bot" and you'll see these checkboxes:
 
