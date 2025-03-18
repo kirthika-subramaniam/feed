@@ -2,7 +2,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
-import { Video, Users, MessageCircle, AlertCircle, MoreHorizontal, Maximize, Minimize, Link, List } from "lucide-react";
+import {
+  Video,
+  Users,
+  MessageCircle,
+  AlertCircle,
+  MoreHorizontal,
+  Maximize,
+  Minimize,
+  Link,
+  List,
+  LogOut,
+} from "lucide-react";
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
@@ -48,8 +59,8 @@ function App() {
   const menuOpenRef = useRef(null);
   const [swiperData, setSwiperData] = useState(null);
   const [isPopup, setIsPopup] = useState(false);
-  const menuRef = useRef(null); // 24
-  const [isMenu, setIsMenu] = useState(false); // 25
+  const menuRef = useRef(null);
+  const [isMenu, setIsMenu] = useState(false);
 
   // Auth state
   const [token, setToken] = useState("");
@@ -240,7 +251,7 @@ function App() {
         setIsLoggingOut(false);
         setIsLoading(false);
         setIsTransitioning(false);
-        setUseMockData(false)
+        setUseMockData(false);
       }, 300);
       return;
     }
@@ -348,15 +359,27 @@ function App() {
     }
   };
 
-  const renderNavItems = () => {
-    const items = [
-      { id: "FeedPlayer", icon: Video, label: "Feed Player" },
-      { id: "MemberSense", icon: Users, label: "MemberSense" },
-      ...(token ? memberSenseDropdownItems : []),
-    ];
+  const memberSenseItems = [...(token ? memberSenseDropdownItems : [])];
 
+  const mediaItems = [
+    { id: "FeedPlayer", icon: Video, label: "Feed Player" },
+    { id: "MemberSense", icon: Users, label: "MemberSense" },
+    ...memberSenseItems,
+  ];
+
+  const getMenuStyles = () => {
+    if (currentView === "FeedPlayer") return { top: "30px", right: "30px" };
+    if (token) {
+      if (currentView === "MemberSense") return { top: "50px", right: "84px" };
+      if (currentView === "Showcase") return { top: "40px", right: "40px" };
+      if (currentView === "DiscordViewer") return { top: "68px", right: "50px" };
+    }
+    if (currentView === "MemberSense") return { top: "50px", right: "50px" };
+  };
+
+  const renderNavItems = (items, excludeCurrentView = true) => {
     return items
-      .filter((item) => item.id !== currentView)
+      .filter((item) => !excludeCurrentView || item.id !== currentView)
       .map((item) => (
         <button
           key={item.id}
@@ -397,64 +420,78 @@ function App() {
                     </button>
                   </div>
                 )}
-                {renderNavItems()}
+                {renderNavItems(mediaItems)}
                 <button onClick={handleFullScreen} className="fullscreen-toggle">
                   <Minimize size={24} />
                   <span>Exit Fullscreen</span>
                 </button>
                 {token && (
                   <button onClick={handleLogout} className="logout-btn">
-                    Logout
+                    <LogOut size={24} />
+                    <span>Logout</span>
                   </button>
                 )}
               </div>
             )}
           </div>
         ) : (
-          <div
-            className="VideoPlayer__toggleMenu"
-            ref={menuRef}
-            style={
-              currentView === "MemberSense"
-                ? { top: "40px", marginRight: "40px" }
-                : { top: "20px", marginRight: "20px" }
-            }
-          >
-            {!isMenu && (
-              <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
-                <MoreHorizontal size={24} />
-              </button>
-            )}
-            {isMenu && (
-              <div className="menu-content">
-                <ul className="menu-list">
-                  {currentView === "FeedPlayer" && (
-                    <>
-                      <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
-                        <List size={24} />
-                        <span>Choose Feeds</span>
-                      </li>
-                      <li className="menu-item" onClick={() => handleMenuClick("url")}>
-                        <Link size={24} />
-                        <span>Paste Your Video URL</span>
-                      </li>
-                    </>
-                  )}
-                  <div className="video-nav">
-                    {renderNavItems()}
-                    <button onClick={handleFullScreen} className="fullscreen-toggle">
-                      <Maximize size={24} />
-                      <span>Fullscreen</span>
+          <div className="nav-menu">
+            {token && (
+              <header className="app-header">
+                <nav className="app-nav">
+                  {token && renderNavItems(memberSenseItems, false)}
+                  {token && (
+                    <button onClick={handleLogout} className="logout-btn">
+                      <LogOut size={24} />
+                      <span>Logout</span>
                     </button>
-                    {token && (
-                      <button onClick={handleLogout} className="logout-btn">
-                        Logout
-                      </button>
-                    )}
-                  </div>
-                </ul>
-              </div>
+                  )}
+                </nav>
+              </header>
             )}
+            <div className="VideoPlayer__toggleMenu" ref={menuRef}>
+              {!isMenu && (
+                <button
+                  className="popup-btn"
+                  onClick={handlePopupClick}
+                  title="Click to Toggle Options"
+                  style={getMenuStyles()}
+                >
+                  <MoreHorizontal size={24} />
+                </button>
+              )}
+              {isMenu && (
+                <div className="menu-content">
+                  <ul className="menu-list">
+                    {currentView === "FeedPlayer" && (
+                      <>
+                        <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
+                          <List size={24} />
+                          <span>Choose Feeds</span>
+                        </li>
+                        <li className="menu-item" onClick={() => handleMenuClick("url")}>
+                          <Link size={24} />
+                          <span>Paste Your Video URL</span>
+                        </li>
+                      </>
+                    )}
+                    <div className="video-nav">
+                      {renderNavItems(mediaItems)}
+                      <button onClick={handleFullScreen} className="fullscreen-toggle">
+                        <Maximize size={24} />
+                        <span>Fullscreen</span>
+                      </button>
+                      {token && (
+                        <button onClick={handleLogout} className="logout-btn">
+                          <LogOut size={24} />
+                          <span>Logout</span>
+                        </button>
+                      )}
+                    </div>
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         )}
         {error && (
