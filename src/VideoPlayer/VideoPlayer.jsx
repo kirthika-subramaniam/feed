@@ -7,7 +7,6 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 import Popup from "../components/Popup/Popup";
-import { Link, Check, MoreHorizontal } from "lucide-react";
 
 function VideoPlayer({
   autoplay = false,
@@ -52,7 +51,19 @@ function VideoPlayer({
   const imageDuration = 4;
 
   const updateURLHash = (feed, ref) => {
-    const hash = `#feed=${encodeURIComponent(feed)}&ref=${ref}`;
+    const existingParams = new URLSearchParams(window.location.hash.substring(1));
+    const otherParams = new URLSearchParams(); // string containing all the extra params in the URL
+
+    existingParams.forEach((value, key) => {
+      if (key !== "feed" && key !== "ref") {
+        otherParams.set(key, value);
+      }
+    });
+
+    let hash = `#feed=${encodeURIComponent(feed)}&ref=${ref}`;
+    if (otherParams.toString()) {
+      hash += `&${otherParams.toString()}`;
+    }
     window.location.hash = hash;
   };
 
@@ -811,7 +822,8 @@ function VideoPlayer({
                 min={0}
               />
               <span className="time">
-                {currentTime[0]}:{String(currentTime[1]).padStart(2,"0")} / {duration[0]}:{String(duration[1]).padStart(2,"0")}
+                {currentTime[0]}:{String(currentTime[1]).padStart(2, "0")} / {duration[0]}:
+                {String(duration[1]).padStart(2, "0")}
               </span>
             </>
           )}

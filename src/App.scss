@@ -1,7 +1,9 @@
 .App {
   display: flex;
   min-height: 150px;
+  flex-direction: column;
   padding: 20px;
+  gap: 20px;
   box-sizing: border-box;
   position: relative;
 
@@ -39,8 +41,6 @@
   }
 
   .app-header {
-    margin-bottom: 20px;
-
     h2 {
       font-size: 1.5rem;
       margin: 0 0 15px;
@@ -191,14 +191,12 @@
 
   .popup-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
     z-index: 100;
     background-color: white;
     border: none;
     border-radius: 0.5rem;
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
     cursor: pointer;
     box-shadow: 0px 0px 29px 0px #bebebe;
     font-size: 2rem;
@@ -206,9 +204,9 @@
 
   .menu-content {
     position: absolute;
-    top: 10px;
+    top: 20px;
     background-color: white;
-    right: 10px;
+    right: 20px;
     z-index: 200;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 14rem;
