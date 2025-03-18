@@ -1,26 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from 'react';
-import { 
-  Eye, 
-  EyeOff, 
-  AlertCircle, 
-  CheckCircle, 
-  Server, 
-  Users, 
-  ToggleLeft, 
-  ToggleRight, 
-  Lock 
-} from 'lucide-react';
-import './MemberSense.scss';
-import Spinner from '../../Spinner/Spinner';
+import React, { useState, useEffect } from "react";
+import { Eye, EyeOff, AlertCircle, CheckCircle, Server, Users, ToggleLeft, ToggleRight, Lock } from "lucide-react";
+import "./MemberSense.scss";
+import Spinner from "../../Spinner/Spinner";
 
 /**
  * MemberSense Component
- * 
+ *
  * A component that handles Discord server authentication and displays server information.
  * Supports both production and demo modes for testing and development.
- * 
+ *
  * @param {Object} props
  * @param {Function} props.onValidToken - Callback function to validate Discord token
  * @param {string} props.initialToken - Initial Discord bot token
@@ -44,6 +34,7 @@ const MemberSense = ({
   isFullScreen,
   useMockData = true,
   onToggleMockData,
+  handleViewChange,
 }) => {
   // State management
   const [showToken, setShowToken] = useState(false);
@@ -65,17 +56,17 @@ const MemberSense = ({
       setTimeout(() => setIsTransitioning(false), 300);
     } else {
       setServerInfo(null);
-      setInputToken('');
+      setInputToken("");
       setValidationMessage(null);
     }
   }, [initialToken, initialServerInfo]);
 
-  useEffect(()=>{
-    if(useMockData===true)handleTokenSubmit();
-  }, [useMockData])
+  useEffect(() => {
+    if (useMockData === true) handleTokenSubmit();
+  }, [useMockData]);
 
   async function handleSampleDiscord() {
-    onToggleMockData(true); 
+    onToggleMockData(true);
   }
   /**
    * Handles token submission and validation
@@ -127,28 +118,18 @@ const MemberSense = ({
   const renderDataModeToggle = () => (
     <div className="data-mode-toggle">
       <div className="toggle-description">
-        <p className="toggle-title">
-          {useMockData ? "Demo Mode" : "Production Mode"}
-        </p>
+        <p className="toggle-title">{useMockData ? "Demo Mode" : "Production Mode"}</p>
         <p className="toggle-subtitle">
-          {useMockData
-            ? "Currently using sample data to explore features"
-            : "Connected to your Discord server data"}
+          {useMockData ? "Currently using sample data to explore features" : "Connected to your Discord server data"}
         </p>
       </div>
-      <button
-        onClick={onToggleMockData}
-        className="toggle-button"
-        type="button"
-      >
+      <button onClick={onToggleMockData} className="toggle-button" type="button">
         {useMockData ? (
           <ToggleRight className="toggle-icon mock" size={24} />
         ) : (
           <ToggleLeft className="toggle-icon real" size={24} />
         )}
-        <span className="toggle-label">
-          {useMockData ? "Sample Team" : "My Discord Team"}
-        </span>
+        <span className="toggle-label">{useMockData ? "Sample Team" : "My Discord Team"}</span>
       </button>
     </div>
   );
@@ -173,11 +154,7 @@ const MemberSense = ({
             className="token-input"
             disabled={isValidating || useMockData}
           />
-          <button
-            type="button"
-            className="toggle-visibility-btn"
-            onClick={() => setShowToken(!showToken)}
-          >
+          <button type="button" className="toggle-visibility-btn" onClick={() => setShowToken(!showToken)}>
             {showToken ? <EyeOff size={20} /> : <Eye size={20} />}
           </button>
         </div>
@@ -197,19 +174,16 @@ const MemberSense = ({
    */
   const renderServerInfo = () => (
     <div className="server-info">
-      {serverInfo.iconURL ? (
-        <img
-          src={serverInfo.iconURL}
-          alt="Server Icon"
-          className="server-icon"
-        />
+      {/* {serverInfo.iconURL ? (
+        <img src={serverInfo.iconURL} alt="Server Icon" className="server-icon" />
       ) : (
         <Server size={48} className="server-icon" />
-      )}
-      <h3 className="server-name">Welcome to {serverInfo.serverName}!</h3>
+      )} */}
+      {/* <h3 className="server-name">Welcome to {serverInfo.serverName}!</h3> */}
+      <h3 className="server-name">Sample Discord Team</h3>
       <p className="server-message">
-        You&apos;re all set to explore MemberSense features. Use the navigation menu
-        to access Member Showcase and Discord Viewer.
+        You&apos;re all set to explore MemberSense features. Use the buttons to access Member Showcase and
+        Discord Viewer.
       </p>
       <div className="server-details">
         {serverInfo.memberCount && (
@@ -219,43 +193,43 @@ const MemberSense = ({
           </p>
         )}
       </div>
+      <div className="navigation-buttons">
+        <button className="nav-button" onClick={() => handleViewChange("Showcase")} title="Show All Members">Members</button>
+        <button className="nav-button" onClick={() => handleViewChange("DiscordViewer")} title="View Discord Channels">Posts</button>
+      </div>
     </div>
   );
 
   return (
     <div className={`member-sense-wrapper ${isFullScreen ? "fullscreen" : ""}`}>
-      <div
-        className={`member-sense-container ${
-          isTransitioning ? "transitioning" : ""
-        }`}
-      >
+      <div className={`member-sense-container ${isTransitioning ? "transitioning" : ""}`}>
         <h1 className="member-sense-title">MemberSense</h1>
 
         {!serverInfo && !useMockData && (
-            <>
-              <div className="token-info">
-                <a
-                  href="https://github.com/ModelEarth/feed/blob/main/MemberSense.md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="token-link"
-                >
-                  How to Get My Team&apos;s Token?
-                </a>
-              <div className='token-info token-link' onClick={handleSampleDiscord}>
+          <>
+            <div className="token-info">
+              <a
+                href="https://github.com/ModelEarth/feed/blob/main/MemberSense.md"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="token-link"
+              >
+                How to Get My Team&apos;s Token?
+              </a>
+              <div className="token-info token-link" onClick={handleSampleDiscord}>
                 View Sample Discord Team and Posts
               </div>
-              </div>
-              <div className="permissions-info">
-                <h4>Required Bot Permissions:</h4>
-                <ul>
-                  <li>View Channels</li>
-                  <li>View Server Insights</li>
-                  <li>Send Messages</li>
-                  <li>Read Message History</li>
-                </ul>
-              </div>
-            </>
+            </div>
+            <div className="permissions-info">
+              <h4>Required Bot Permissions:</h4>
+              <ul>
+                <li>View Channels</li>
+                <li>View Server Insights</li>
+                <li>Send Messages</li>
+                <li>Read Message History</li>
+              </ul>
+            </div>
+          </>
         )}
 
         {/* {!isLoggedIn && renderDataModeToggle()} */}
@@ -268,11 +242,7 @@ const MemberSense = ({
             {serverInfo ? renderServerInfo() : renderTokenForm()}
 
             {(validationMessage || error) && (
-              <div
-                className={`validation-message ${
-                  validationMessage?.type || "error"
-                }`}
-              >
+              <div className={`validation-message ${validationMessage?.type || "error"}`}>
                 {validationMessage?.type === "success" ? (
                   <CheckCircle className="message-icon" size={20} />
                 ) : (
@@ -281,8 +251,6 @@ const MemberSense = ({
                 {validationMessage?.text || error}
               </div>
             )}
-
-            
           </>
         )}
         {(isValidating || isLoggingOut) && (
