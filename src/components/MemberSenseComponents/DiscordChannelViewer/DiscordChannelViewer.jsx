@@ -1,28 +1,26 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { MessageCircle, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import './DiscordChannelViewer.scss';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { MessageCircle, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import "./DiscordChannelViewer.scss";
 
 /**
  * ChannelName Component
  * Renders a channel name with optional truncation and ellipsis
- * 
+ *
  * @param {Object} props
  * @param {string} props.name - Channel name to display
  * @param {number} props.maxLength - Maximum length before truncation
  */
 const ChannelName = ({ name, maxLength }) => (
-  <span title={name}>
-    {name.length <= maxLength ? name : `${name.substr(0, maxLength - 3)}...`}
-  </span>
+  <span title={name}>{name.length <= maxLength ? name : `${name.substr(0, maxLength - 3)}...`}</span>
 );
 
 /**
  * DiscordChannelViewer Component
  * Displays Discord channel messages with pagination and channel selection
- * 
+ *
  * @param {Object} props
  * @param {Array} props.channels - List of available channels
  * @param {Array} props.messages - List of messages in the selected channel
@@ -31,14 +29,7 @@ const ChannelName = ({ name, maxLength }) => (
  * @param {boolean} props.isLoading - Loading state indicator
  * @param {boolean} props.isFullScreen - Fullscreen display mode
  */
-const DiscordChannelViewer = ({
-  channels,
-  messages,
-  selectedChannel,
-  onChannelSelect,
-  isLoading,
-  isFullScreen
-}) => {
+const DiscordChannelViewer = ({ channels, messages, selectedChannel, onChannelSelect, isLoading, isFullScreen }) => {
   // State Management
   const [currentPage, setCurrentPage] = useState(1);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -56,11 +47,11 @@ const DiscordChannelViewer = ({
   useEffect(() => {
     if (containerRef.current) {
       const styles = {
-        height: isFullScreen ? '100vh' : '80vh',
-        width: isFullScreen ? '100vw' : '100vh',
-        maxWidth: isFullScreen ? 'none' : '800px',
-        margin: isFullScreen ? '0' : '20px auto',
-        borderRadius: isFullScreen ? '0' : '12px'
+        height: isFullScreen ? "100vh" : "80vh",
+        width: isFullScreen ? "100vw" : "100vh",
+        maxWidth: isFullScreen ? "none" : "800px",
+        margin: isFullScreen ? "0" : "20px auto",
+        borderRadius: isFullScreen ? "0" : "12px",
       };
       Object.assign(containerRef.current.style, styles);
     }
@@ -75,9 +66,9 @@ const DiscordChannelViewer = ({
         setIsDropdownOpen(false);
       }
     };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   /**
@@ -89,17 +80,14 @@ const DiscordChannelViewer = ({
     setIsDropdownOpen(false);
   };
 
-  const handlePrevious = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-  
-  const handleNext = () => setCurrentPage(prev => prev + 1);
+  const handlePrevious = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+
+  const handleNext = () => setCurrentPage((prev) => prev + 1);
 
   /**
    * Data Processing
    */
-  const paginatedMessages = messages.slice(
-    (currentPage - 1) * MESSAGES_PER_PAGE,
-    currentPage * MESSAGES_PER_PAGE
-  );
+  const paginatedMessages = messages.slice((currentPage - 1) * MESSAGES_PER_PAGE, currentPage * MESSAGES_PER_PAGE);
 
   /**
    * Animation Configurations
@@ -107,12 +95,12 @@ const DiscordChannelViewer = ({
   const fullScreenVariants = {
     normal: {
       scale: 1,
-      transition: { duration: 0.3, ease: 'easeInOut' }
+      transition: { duration: 0.3, ease: "easeInOut" },
     },
     fullScreen: {
       scale: 1,
-      transition: { duration: 0.3, ease: 'easeInOut' }
-    }
+      transition: { duration: 0.3, ease: "easeInOut" },
+    },
   };
 
   /**
@@ -121,25 +109,22 @@ const DiscordChannelViewer = ({
   const renderChannelDropdown = () => (
     <div className="dropdown-container">
       <div className="dropdown" ref={dropdownRef}>
-        <button 
+        <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="dropdown-toggle"
-          title={channels.find(c => c.id === selectedChannel)?.name || 'Select Channel'}
+          title={channels.find((c) => c.id === selectedChannel)?.name || "Select Channel"}
         >
           <MessageCircle size={20} />
-          <ChannelName 
-            name={channels.find(c => c.id === selectedChannel)?.name || 'Select Channel'} 
-            maxLength={20}
-          />
+          <ChannelName name={channels.find((c) => c.id === selectedChannel)?.name || "Select Channel"} maxLength={20} />
           <ChevronDown size={16} />
         </button>
         {isDropdownOpen && (
           <div className="dropdown-content">
             {channels.map((channel) => (
-              <button 
+              <button
                 key={channel.id}
                 onClick={() => handleChannelSelect(channel.id)}
-                className={selectedChannel === channel.id ? 'active' : ''}
+                className={selectedChannel === channel.id ? "active" : ""}
                 title={channel.name}
               >
                 <MessageCircle size={16} />
@@ -167,9 +152,7 @@ const DiscordChannelViewer = ({
             <div className="message-content">
               <h4>{message.author.name}</h4>
               <p>{message.content}</p>
-              <span className="timestamp">
-                {new Date(message.timestamp).toLocaleString()}
-              </span>
+              <span className="timestamp">{new Date(message.timestamp).toLocaleString()}</span>
             </div>
           </div>
         ))
@@ -181,33 +164,25 @@ const DiscordChannelViewer = ({
 
   const renderPagination = () => (
     <div className="pagination">
-      <button 
-        onClick={handlePrevious} 
-        disabled={currentPage === 1 || isLoading}
-      >
+      <button onClick={handlePrevious} disabled={currentPage === 1 || isLoading}>
         <ChevronLeft size={16} />
       </button>
       <span>Page {currentPage}</span>
-      <button 
-        onClick={handleNext} 
-        disabled={currentPage * MESSAGES_PER_PAGE >= messages.length || isLoading}
-      >
+      <button onClick={handleNext} disabled={currentPage * MESSAGES_PER_PAGE >= messages.length || isLoading}>
         <ChevronRight size={16} />
       </button>
     </div>
   );
 
   return (
-    <motion.div 
-      className={`discord-channel-viewer ${isFullScreen ? 'fullscreen' : ''}`}
+    <motion.div
+      className={`discord-channel-viewer ${isFullScreen ? "fullscreen" : ""}`}
       ref={containerRef}
       variants={fullScreenVariants}
-      animate={isFullScreen ? 'fullScreen' : 'normal'}
+      animate={isFullScreen ? "fullScreen" : "normal"}
     >
-      <nav className="app-nav">
-        {renderChannelDropdown()}
-      </nav>
-      
+      <nav className="app-nav">{renderChannelDropdown()}</nav>
+
       <main className="app-content">
         <AnimatePresence mode="wait">
           {isLoading ? (

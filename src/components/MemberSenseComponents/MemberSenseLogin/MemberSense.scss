@@ -281,6 +281,34 @@
       font-weight: 500;
     }
   }
+  .navigation-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+  
+    .nav-button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #7289da 0%, #5865f2 100%);
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      width: 6rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s, transform 0.2s;
+  
+      &:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+      }
+  
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
 }
 
 .validation-message {

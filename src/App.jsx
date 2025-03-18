@@ -338,6 +338,7 @@ function App() {
             isFullScreen={isFullScreen}
             useMockData={useMockData}
             onToggleMockData={(value) => setUseMockData(value)}
+            handleViewChange={handleViewChange}
             {...commonProps}
           />
         );
@@ -370,7 +371,7 @@ function App() {
   const getMenuStyles = () => {
     if (currentView === "FeedPlayer") return { top: "30px", right: "30px" };
     if (token) {
-      if (currentView === "MemberSense") return { top: "50px", right: "84px" };
+      if (currentView === "MemberSense") return { top: "50px", right: "50px" };
       if (currentView === "Showcase") return { top: "40px", right: "40px" };
       if (currentView === "DiscordViewer") return { top: "68px", right: "50px" };
     }
@@ -436,19 +437,6 @@ function App() {
           </div>
         ) : (
           <div className="nav-menu">
-            {token && (
-              <header className="app-header">
-                <nav className="app-nav">
-                  {token && renderNavItems(memberSenseItems, false)}
-                  {token && (
-                    <button onClick={handleLogout} className="logout-btn">
-                      <LogOut size={24} />
-                      <span>Logout</span>
-                    </button>
-                  )}
-                </nav>
-              </header>
-            )}
             <div className="VideoPlayer__toggleMenu" ref={menuRef}>
               {!isMenu && (
                 <button
