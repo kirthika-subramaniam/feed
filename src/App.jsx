@@ -2,17 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import reactToWebComponent from "react-to-webcomponent";
 import ReactDOM from "react-dom";
-import {
-  Video,
-  Users,
-  MessageCircle,
-  AlertCircle,
-  MoreHorizontal,
-  Maximize,
-  Minimize,
-  Check,
-  Link,
-} from "lucide-react";
+import { Video, Users, MessageCircle, AlertCircle, MoreHorizontal, Maximize, Minimize, Link, List } from "lucide-react";
 
 // Components
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
@@ -58,6 +48,8 @@ function App() {
   const menuOpenRef = useRef(null);
   const [swiperData, setSwiperData] = useState(null);
   const [isPopup, setIsPopup] = useState(false);
+  const menuRef = useRef(null); // 24
+  const [isMenu, setIsMenu] = useState(false); // 25
 
   // Auth state
   const [token, setToken] = useState("");
@@ -78,6 +70,31 @@ function App() {
     { id: "Showcase", icon: Users, label: "Member Showcase" },
     { id: "DiscordViewer", icon: MessageCircle, label: "Discord Viewer" },
   ];
+
+  const handlePopupClick = () => {
+    setSelectedOption("");
+    setIsMenu(true);
+  };
+
+  const handleMenuClick = (option) => {
+    setIsMenu(false);
+    setSelectedOption(option);
+  };
+
+  // Click outside to close the menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If menuRef exists and the click is NOT inside it, close the menu
+      if (menuRef.current && !menuRef.current.contains(event.target)) setIsMenu(false);
+    };
+
+    if (isMenu) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenu]);
+
+  useEffect(() => {
+    if (isMenu) setIsMenu(false);
+  }, [currentView]);
 
   // Effects
   useEffect(() => {
@@ -120,6 +137,15 @@ function App() {
       setIsPopup(true);
     }
   }, [swiperData]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuOpenRef.current && !menuOpenRef.current.contains(event.target)) setIsMenuOpen(false);
+    };
+
+    if (isMenuOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
 
   useEffect(() => {
     if (sessionId && selectedChannel) {
@@ -214,6 +240,7 @@ function App() {
         setIsLoggingOut(false);
         setIsLoading(false);
         setIsTransitioning(false);
+        setUseMockData(false)
       }, 300);
       return;
     }
@@ -299,7 +326,7 @@ function App() {
             serverInfo={serverInfo}
             isFullScreen={isFullScreen}
             useMockData={useMockData}
-            onToggleMockData={() => setUseMockData(!useMockData)}
+            onToggleMockData={(value) => setUseMockData(value)}
             {...commonProps}
           />
         );
@@ -328,37 +355,23 @@ function App() {
       ...(token ? memberSenseDropdownItems : []),
     ];
 
-    return items.map((item) => (
-      <button
-        key={item.id}
-        onClick={() => {
-          handleViewChange(item.id);
-          if (isFullScreen) setIsMenuOpen(false);
-        }}
-        className={currentView === item.id ? "active" : ""}
-        title={item.label}
-      >
-        <item.icon size={24} />
-        <span>{item.label}</span>
-      </button>
-    ));
+    return items
+      .filter((item) => item.id !== currentView)
+      .map((item) => (
+        <button
+          key={item.id}
+          onClick={() => {
+            handleViewChange(item.id);
+            if (isFullScreen) setIsMenuOpen(false);
+          }}
+          className={currentView === item.id ? "active" : ""}
+          title={item.label}
+        >
+          <item.icon size={24} />
+          <span>{item.label}</span>
+        </button>
+      ));
   };
-
-  const handleMenuClick = (option) => {
-    setSelectedOption(option);
-    setIsMenuOpen(false);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuOpenRef.current && !menuOpenRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    if (isMenuOpen) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
 
   return (
     <ContextProvider>
@@ -375,7 +388,7 @@ function App() {
                 {currentView === "FeedPlayer" && (
                   <div>
                     <button onClick={() => handleMenuClick("feeds")}>
-                      <Check size={24} />
+                      <List size={24} />
                       <span>Choose Feeds</span>
                     </button>
                     <button onClick={() => handleMenuClick("url")}>
@@ -398,21 +411,52 @@ function App() {
             )}
           </div>
         ) : (
-          <header className="app-header">
-            <nav className="app-nav">
-              {renderNavItems()}
-              <button onClick={handleFullScreen} className="fullscreen-toggle">
-                {isFullScreen ? <Minimize size={24} /> : <Maximize size={24} />}
+          <div
+            className="VideoPlayer__toggleMenu"
+            ref={menuRef}
+            style={
+              currentView === "MemberSense"
+                ? { top: "40px", marginRight: "40px" }
+                : { top: "20px", marginRight: "20px" }
+            }
+          >
+            {!isMenu && (
+              <button className="popup-btn" onClick={handlePopupClick} title="Click to Toggle Options">
+                <MoreHorizontal size={24} />
               </button>
-              {token && (
-                <button onClick={handleLogout} className="logout-btn">
-                  Logout
-                </button>
-              )}
-            </nav>
-          </header>
+            )}
+            {isMenu && (
+              <div className="menu-content">
+                <ul className="menu-list">
+                  {currentView === "FeedPlayer" && (
+                    <>
+                      <li className="menu-item" onClick={() => handleMenuClick("feeds")}>
+                        <List size={24} />
+                        <span>Choose Feeds</span>
+                      </li>
+                      <li className="menu-item" onClick={() => handleMenuClick("url")}>
+                        <Link size={24} />
+                        <span>Paste Your Video URL</span>
+                      </li>
+                    </>
+                  )}
+                  <div className="video-nav">
+                    {renderNavItems()}
+                    <button onClick={handleFullScreen} className="fullscreen-toggle">
+                      <Maximize size={24} />
+                      <span>Fullscreen</span>
+                    </button>
+                    {token && (
+                      <button onClick={handleLogout} className="logout-btn">
+                        Logout
+                      </button>
+                    )}
+                  </div>
+                </ul>
+              </div>
+            )}
+          </div>
         )}
-
         {error && (
           <div className="error-message">
             <AlertCircle className="error-icon" />
@@ -422,7 +466,9 @@ function App() {
         <main className={`app-content ${isTransitioning ? "fade-out" : "fade-in"}`}>{renderContent()}</main>
         {isPopup && (
           <div className="lightbox" onClick={() => setIsPopup(null)}>
-            <button className="close-btn" onClick={() => setIsPopup(null)}>x</button>
+            <button className="close-btn" onClick={() => setIsPopup(null)}>
+              x
+            </button>
             {swiperData.mediaType === "video" ? (
               <iframe className="lightboxImg" src={swiperData.url} alt="Enlarged Video" allowFullScreen />
             ) : (
