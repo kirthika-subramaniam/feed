@@ -125,7 +125,7 @@ website
    └─ .gitignore
 ```
 
-Also see the [MemberSense directory structure](https://github.com/ModelEarth/feed/blob/main/MemberSense.md).
+Also see the [MemberSense directory structure](membersense).
 
 ## Edit and build the "feed" project locally
 
