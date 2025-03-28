@@ -1,10 +1,12 @@
-
 name: Deploy Vite site to GitHub Pages
 
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to main
+      - main  # Trigger deployment on push to main
+
+permissions:
+  contents: write  # Required to push to gh-pages
 
 jobs:
   build-and-deploy:
@@ -19,14 +21,15 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install dependencies with Yarn
         run: yarn install
 
-      - name: Build project
+      - name: Build the Vite project
         run: yarn build
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages
-          folder: dist
+          branch: gh-pages           # Target branch
+          folder: dist               # Folder to deploy
+          clean: true                # Remove old files before upload
