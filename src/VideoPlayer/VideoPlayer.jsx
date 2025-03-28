@@ -694,6 +694,7 @@ function VideoPlayer({
       window.removeEventListener("fullscreenchange", recalcImageScale);
     };
   }, []);
+
   return (
     <div className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`} ref={containerRef}>
       <div className="VideoPlayer__video-container" onMouseLeave={handleMouseLeave}>
@@ -709,37 +710,33 @@ function VideoPlayer({
           </div>
         ) : currentMedia && currentMedia.url ? (
           isImageFile(currentMedia.url) ? (
-<img
-ref={imageRef}
-className="video-image image-file"
-src={currentMedia.url}
-alt={currentMedia.title || "Media"}
-onLoad={() => {
-  if (imageRef.current && containerRef.current) {
-    const image = imageRef.current;
-    const container = containerRef.current;
-    const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
-    const { naturalWidth, naturalHeight } = image;
-    const scaleFactor = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight);
-    const scaledWidth = naturalWidth * scaleFactor;
-    const scaledHeight = naturalHeight * scaleFactor;
+            <img
+              ref={imageRef}
+              className="video-image image-file"
+              src={currentMedia.url}
+              alt={currentMedia.title || "Media"}
+              onLoad={() => {
+                if (imageRef.current && containerRef.current) {
+                const image = imageRef.current;
+                const container = containerRef.current;
+                const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+                const { naturalWidth, naturalHeight } = image;
+                const scaleFactor = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight);
+                const scaledWidth = naturalWidth * scaleFactor;
+                const scaledHeight = naturalHeight * scaleFactor;
     
-    image.style.width = `${scaledWidth}px`;
-    image.style.height = `${scaledHeight}px`;
-    
-    // Remove margin adjustments since we're using absolute positioning.
-    const overflow = scaledHeight - containerHeight;
-    if (overflow > 0) {
-      image.style.setProperty("--pan-distance", `${overflow}px`);
-      image.classList.add("pan-vertical");
-    } else {
-      image.classList.remove("pan-vertical");
-    }
-  }
-}}
-
-
-/>
+                image.style.width = `${scaledWidth}px`;
+                image.style.height = `${scaledHeight}px`;
+                const overflow = scaledHeight - containerHeight;
+                if (overflow > 0) {
+                image.style.setProperty("--pan-distance", `${overflow}px`);
+                image.classList.add("pan-vertical");
+                 } else {
+                image.classList.remove("pan-vertical");
+              }
+            }
+          }} />
+          
           ) : isVideoFile(currentMedia.url) ? (
             <div className="video-wrapper">
               <video
