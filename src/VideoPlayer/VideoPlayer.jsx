@@ -257,7 +257,16 @@ function VideoPlayer({
       }));
     } catch (error) {
       console.error(`Error processing media with title ${media.title}:`, error);
-      templistofMedia[media.title] = [];
+      templistofMedia[media.title] = [{
+        url: null,
+        text: `Error: ${error.message || "Unknown error"}`,
+        title: `Failed to load ${media.title}`,
+        isError: true
+      }];
+      setListofMedia((prev) => ({
+        ...prev,
+        [media.title]: templistofMedia[media.title],
+      }));
     }
     setLoadingFeeds((prev) => ({ ...prev, [media.title]: false }));
   };
@@ -337,7 +346,12 @@ function VideoPlayer({
       }
     } catch (error) {
       console.error("Error fetching from API for", media.title, ":", error);
-      return [];
+      return [{
+        url: null,
+        text: `Error: ${error.message || "Unknown error"}`,
+        title: `Failed to load ${media.title}`,
+        isError: true
+      }];
     }
   };
 
@@ -687,6 +701,11 @@ function VideoPlayer({
           <div className="VideoPlayer__loading">
             <div className="spinner"></div>
             <p>Loading media...</p>
+          </div>
+        ) : currentMedia && currentMedia.isError ? (
+          <div className="VideoPlayer__error">
+            <h3>{currentMedia.title}</h3>
+            <p>{currentMedia.text}</p>
           </div>
         ) : currentMedia && currentMedia.url ? (
           isImageFile(currentMedia.url) ? (
