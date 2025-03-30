@@ -1,14 +1,19 @@
-import { useRef } from "react";
+import { useRef} from "react";
 import "./Popup.scss";
 import PropType from "prop-types";
 
-export default function Popup({ setVideoList, setCurrentVideoSrc, setSelectedOption }) {
+export default function Popup({ setVideoData, setSelectedOption }) {
   const srcInputRef = useRef(null);
   const handlePlay = async () => {
     if (!(await validateVideoUrl(srcInputRef.current.value))) return alert("Invalid URL");
 
-    setVideoList((prev) => [...prev, srcInputRef.current.value]);
-    setCurrentVideoSrc(srcInputRef.current.value);
+    if (srcInputRef.current.value) {
+      setVideoData({
+        url: srcInputRef.current.value,
+        text: "No description available",
+        title: srcInputRef.current.value.split("/").pop(),
+      });
+    }
     setSelectedOption("");
   };
 
@@ -53,7 +58,6 @@ export default function Popup({ setVideoList, setCurrentVideoSrc, setSelectedOpt
 }
 
 Popup.propTypes = {
-  setVideoList: PropType.func.isRequired,
-  setCurrentVideoSrc: PropType.func.isRequired,
+  setVideoData: PropType.func.isRequired, 
   setSelectedOption: PropType.func.isRequired,
 };
