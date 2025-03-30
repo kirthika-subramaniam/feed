@@ -2,7 +2,7 @@ import { useRef } from "react";
 import "./Popup.scss";
 import PropType from "prop-types";
 
-export default function Popup({ setVideoList, setCurrentVideoSrc, setSelectedOption}) {
+export default function Popup({ setVideoList, setCurrentVideoSrc, setSelectedOption }) {
   const srcInputRef = useRef(null);
   const handlePlay = async () => {
     if (!(await validateVideoUrl(srcInputRef.current.value))) return alert("Invalid URL");
