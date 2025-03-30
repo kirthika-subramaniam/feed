@@ -47,6 +47,9 @@ function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
   const [isExpanded, setIsExpanded] = useState(false); // 23
+  const imageRef = useRef(null); // 24
+  const [isTallImage, setIsTallImage] = useState(false); // 25
+
 
   const imageDuration = 4;
 
@@ -254,7 +257,16 @@ function VideoPlayer({
       }));
     } catch (error) {
       console.error(`Error processing media with title ${media.title}:`, error);
-      templistofMedia[media.title] = [];
+      templistofMedia[media.title] = [{
+        url: null,
+        text: `Error: ${error.message || "Unknown error"}`,
+        title: `Failed to load ${media.title}`,
+        isError: true
+      }];
+      setListofMedia((prev) => ({
+        ...prev,
+        [media.title]: templistofMedia[media.title],
+      }));
     }
     setLoadingFeeds((prev) => ({ ...prev, [media.title]: false }));
   };
@@ -334,7 +346,12 @@ function VideoPlayer({
       }
     } catch (error) {
       console.error("Error fetching from API for", media.title, ":", error);
-      return [];
+      return [{
+        url: null,
+        text: `Error: ${error.message || "Unknown error"}`,
+        title: `Failed to load ${media.title}`,
+        isError: true
+      }];
     }
   };
 
@@ -464,7 +481,7 @@ function VideoPlayer({
     // Call the function passed from the parent
     handleFullScreen();
   };
-
+  
   const handleVolumeRange = () => {
     if (volumeRangeRef.current) {
       let volume = volumeRangeRef.current.value;
@@ -641,6 +658,43 @@ function VideoPlayer({
     };
   }, [setIsFullScreen]);
 
+  useEffect(() => {
+    const recalcImageScale = () => {
+      if (imageRef.current && containerRef.current) {
+        const image = imageRef.current;
+        const container = containerRef.current;
+        const naturalWidth = image.naturalWidth;
+        const naturalHeight = image.naturalHeight;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        const scaleWidth = containerWidth / naturalWidth;
+        const scaleHeight = containerHeight / naturalHeight;
+        const scaleFactor = Math.max(scaleWidth, scaleHeight);
+        const scaledWidth = naturalWidth * scaleFactor;
+        const scaledHeight = naturalHeight * scaleFactor;
+        image.style.width = `${scaledWidth}px`;
+        image.style.height = `${scaledHeight}px`;
+        const extraWidth = scaledWidth - containerWidth;
+        image.style.marginLeft = extraWidth ? `-${extraWidth / 2}px` : "0";
+        image.style.marginTop = "0";
+        const extraHeight = scaledHeight - containerHeight;
+        if (extraHeight > 0) {
+          image.style.setProperty("--pan-distance", `${extraHeight}px`);
+          image.classList.add("pan-vertical");
+        } else {
+          image.classList.remove("pan-vertical");
+        }
+      }
+    };
+    window.addEventListener("resize", recalcImageScale);
+    window.addEventListener("fullscreenchange", recalcImageScale);
+    
+    return () => {
+      window.removeEventListener("resize", recalcImageScale);
+      window.removeEventListener("fullscreenchange", recalcImageScale);
+    };
+  }, []);
+
   return (
     <div className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`} ref={containerRef}>
       <div className="VideoPlayer__video-container" onMouseLeave={handleMouseLeave}>
@@ -649,14 +703,45 @@ function VideoPlayer({
             <div className="spinner"></div>
             <p>Loading media...</p>
           </div>
+        ) : currentMedia && currentMedia.isError ? (
+          <div className="VideoPlayer__error">
+            <h3>{currentMedia.title}</h3>
+            <p>{currentMedia.text}</p>
+          </div>
         ) : currentMedia && currentMedia.url ? (
           isImageFile(currentMedia.url) ? (
-            <img className="video-image" src={currentMedia.url} alt={currentMedia.title || "Media"} />
+            <img
+              ref={imageRef}
+              className="video-image image-file"
+              src={currentMedia.url}
+              alt={currentMedia.title || "Media"}
+              onLoad={() => {
+                if (imageRef.current && containerRef.current) {
+                const image = imageRef.current;
+                const container = containerRef.current;
+                const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+                const { naturalWidth, naturalHeight } = image;
+                const scaleFactor = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight);
+                const scaledWidth = naturalWidth * scaleFactor;
+                const scaledHeight = naturalHeight * scaleFactor;
+    
+                image.style.width = `${scaledWidth}px`;
+                image.style.height = `${scaledHeight}px`;
+                const overflow = scaledHeight - containerHeight;
+                if (overflow > 0) {
+                image.style.setProperty("--pan-distance", `${overflow}px`);
+                image.classList.add("pan-vertical");
+                 } else {
+                image.classList.remove("pan-vertical");
+              }
+            }
+          }} />
+          
           ) : isVideoFile(currentMedia.url) ? (
             <div className="video-wrapper">
               <video
                 ref={videoRef}
-                className="video-image"
+                className="video-image video-file"
                 src={currentMedia.url}
                 poster="src/assets/images/intro-a.jpg"
                 muted={isMute}

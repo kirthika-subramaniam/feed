@@ -209,7 +209,7 @@ const MemberSense = ({
           <>
             <div className="token-info">
               <a
-                href="https://github.com/ModelEarth/feed/blob/main/MemberSense.md"
+                href="https://github.com/ModelEarth/feed/blob/main/membersense/README.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="token-link"
