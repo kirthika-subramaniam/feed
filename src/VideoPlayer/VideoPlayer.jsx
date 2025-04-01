@@ -269,6 +269,14 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
+        if(!swiperData) {
+          return {
+            url: null,
+            text: "Please click on a Swiper Image to view",
+            title: `Failed to load ${media.title}`,
+            isError: true,
+          }
+        }
         return {
           url: swiperData.url,
           text: swiperData.text || "No description available",
@@ -276,6 +284,14 @@ function VideoPlayer({
         };
       }
       if (media.feed.trim().toLowerCase() === "linkedvideo") {
+        if(!videoData) {
+          return {
+            url: null,
+            text: "Please upload a video link to view",
+            title: `Failed to load ${media.title}`,
+            isError: true,
+          }
+        }
         return {
           url: videoData.url,
           text: videoData.text,
