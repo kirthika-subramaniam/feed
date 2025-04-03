@@ -1,6 +1,5 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../Context/ContextGoogle";
-import { VideoContext } from "../Context/Context";
 import { formatTime } from "../utils/formatTime";
 import "./VideoPlayer.scss";
 import axios from "axios";
@@ -20,7 +19,6 @@ function VideoPlayer({
 }) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
-  const { setVideoList, setCurrentVideoSrc } = useContext(VideoContext); // 0
   const [isPlaying, setIsPlaying] = useState(autoplay); // 1
   const [currentVolume, setCurrentVolume] = useState(1); // 2
   const [isMute, setIsMute] = useState(true); // 3
@@ -49,7 +47,7 @@ function VideoPlayer({
   const [isExpanded, setIsExpanded] = useState(false); // 23
   const imageRef = useRef(null); // 24
   const [isTallImage, setIsTallImage] = useState(false); // 25
-
+  const [videoData, setVideoData] = useState(null); // 26
 
   const imageDuration = 4;
 
@@ -78,32 +76,6 @@ function VideoPlayer({
       ref: parseInt(params.get("ref"), 10) || 0, // Default to 0 if ref is not valid
     };
   };
-
-  // const handlePopupClick = () => {
-  //   setSelectedOption("");
-  //   setIsMenu(true);
-  //   pause();
-  // };
-
-  // const handleMenuClick = (option) => {
-  //   setIsMenu(false);
-  //   setSelectedOption(option);
-  //   play();
-  // };
-
-  // // Click outside to close the menu
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     // If menuRef exists and the click is NOT inside it, close the menu
-  //     if (menuRef.current && !menuRef.current.contains(event.target)) {
-  //       setIsMenu(false);
-  //       play();
-  //     }
-  //   };
-
-  //   if (isMenu) document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, [isMenu]);
 
   useEffect(() => {
     if (currentMedia && selectedMediaList.length > 0) updateURLHash(mediaList[index].feed, currentMediaIndex);
@@ -151,6 +123,26 @@ function VideoPlayer({
     };
     processSwiperData();
   }, [swiperData]);
+
+  useEffect(() => {
+    const processVideoData = async () => {
+      setIsLoading(true);
+      const templistofMedia = {};
+      const linkedVideoFeed = mediaList.find((media) => media.feed.trim().toLowerCase() === "linkedvideo");
+      if (linkedVideoFeed) {
+        await loadFeed(linkedVideoFeed, templistofMedia);
+        setIndex(9);
+        setCurrentMediaIndex(0);
+        setLoadedFeeds(["linkedvideo"]);
+        setListofMedia(templistofMedia);
+        setSelectedMediaList(templistofMedia[linkedVideoFeed.title]);
+        setCurrentMedia(templistofMedia[linkedVideoFeed.title][0]);
+        setActiveFeed("linkedvideo");
+      }
+      setIsLoading(false);
+    };
+    processVideoData();
+  }, [videoData]);
 
   useEffect(() => {
     const { feed, ref } = parseHash();
@@ -279,10 +271,33 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
+        if(!swiperData) {
+          return {
+            url: null,
+            text: "Please click on a Swiper Image to view",
+            title: `Failed to load ${media.title}`,
+            isError: true,
+          }
+        }
         return {
           url: swiperData.url,
           text: swiperData.text || "No description available",
           title: swiperData.title,
+        };
+      }
+      if (media.feed.trim().toLowerCase() === "linkedvideo") {
+        if(!videoData) {
+          return {
+            url: null,
+            text: "Please upload a video link to view",
+            title: `Failed to load ${media.title}`,
+            isError: true,
+          }
+        }
+        return {
+          url: videoData.url,
+          text: videoData.text,
+          title: videoData.title,
         };
       }
       const response = await axios.get(media.url);
@@ -350,12 +365,14 @@ function VideoPlayer({
       }
     } catch (error) {
       console.error("Error fetching from API for", media.title, ":", error);
-      return [{
-        url: null,
-        text: `Error: ${error.message || "Unknown error"}`,
-        title: `Failed to load ${media.title}`,
-        isError: true
-      }];
+      return [
+        {
+          url: null,
+          text: `Error: ${error.message || "Unknown error"}`,
+          title: `Failed to load ${media.title}`,
+          isError: true,
+        },
+      ];
     }
   };
 
@@ -485,7 +502,7 @@ function VideoPlayer({
     // Call the function passed from the parent
     handleFullScreen();
   };
-  
+
   const handleVolumeRange = () => {
     if (volumeRangeRef.current) {
       let volume = volumeRangeRef.current.value;
@@ -692,7 +709,7 @@ function VideoPlayer({
     };
     window.addEventListener("resize", recalcImageScale);
     window.addEventListener("fullscreenchange", recalcImageScale);
-    
+
     return () => {
       window.removeEventListener("resize", recalcImageScale);
       window.removeEventListener("fullscreenchange", recalcImageScale);
@@ -729,26 +746,26 @@ function VideoPlayer({
               }}
               onLoad={() => {
                 if (imageRef.current && containerRef.current) {
-                const image = imageRef.current;
-                const container = containerRef.current;
-                const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
-                const { naturalWidth, naturalHeight } = image;
-                const scaleFactor = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight);
-                const scaledWidth = naturalWidth * scaleFactor;
-                const scaledHeight = naturalHeight * scaleFactor;
-    
-                image.style.width = `${scaledWidth}px`;
-                image.style.height = `${scaledHeight}px`;
-                const overflow = scaledHeight - containerHeight;
-                if (overflow > 0) {
-                image.style.setProperty("--pan-distance", `${overflow}px`);
-                image.classList.add("pan-vertical");
-                 } else {
-                image.classList.remove("pan-vertical");
-              }
-            }
-          }} />
-          
+                  const image = imageRef.current;
+                  const container = containerRef.current;
+                  const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+                  const { naturalWidth, naturalHeight } = image;
+                  const scaleFactor = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight);
+                  const scaledWidth = naturalWidth * scaleFactor;
+                  const scaledHeight = naturalHeight * scaleFactor;
+
+                  image.style.width = `${scaledWidth}px`;
+                  image.style.height = `${scaledHeight}px`;
+                  const overflow = scaledHeight - containerHeight;
+                  if (overflow > 0) {
+                    image.style.setProperty("--pan-distance", `${overflow}px`);
+                    image.classList.add("pan-vertical");
+                  } else {
+                    image.classList.remove("pan-vertical");
+                  }
+                }
+              }}
+            />
           ) : isVideoFile(currentMedia.url) ? (
             <div className="video-wrapper">
               <video
@@ -835,7 +852,7 @@ function VideoPlayer({
             </div>
           </div>
         )}
-        {selectedOption === "url" && <Popup {...{ setVideoList, setCurrentVideoSrc, setSelectedOption }} />}
+        {selectedOption === "url" && <Popup {...{ setVideoData, setSelectedOption }} />}
         {selectedOption === "feeds" && (
           <div className="VideoPlayer__dropdown">
             <div className="VideoPlayer__select" onClick={() => setIsDropdownActive(!isDropdownActive)}>
