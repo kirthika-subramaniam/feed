@@ -245,9 +245,22 @@ function VideoPlayer({
     setIsLoading(false);
   };
 
+  const handleGlobalError = (error, mediaTitle = "Error") => {
+    console.error("Global error handler triggered:", error);
+    const placeholderMedia = {
+      url: "src/assets/images/intro-landscape.jpg", // Placeholder image
+      text: error.message || "An unknown error occurred", // Use the specific error message
+      title: `Failed to load ${mediaTitle}`, // Display the media title with the error
+      isError: true 
+    };
+    setSelectedMediaList([placeholderMedia]); // Set placeholder as the selected media
+    setCurrentMedia(placeholderMedia); // Set placeholder as the current media
+  };
+
+  // Wrap the loadFeed function to pass the media title to the global error handler
   const loadFeed = async (media, templistofMedia) => {
-    setLoadingFeeds((prev) => ({ ...prev, [media.title]: true }));
     try {
+      setLoadingFeeds((prev) => ({ ...prev, [media.title]: true }));
       const mediaItems = await fetchMediaFromAPI(media);
       templistofMedia[media.title] = Array.isArray(mediaItems) ? mediaItems : [mediaItems];
       setLoadedFeeds((prev) => [...prev, media.feed.trim().toLowerCase()]);
@@ -256,19 +269,10 @@ function VideoPlayer({
         [media.title]: templistofMedia[media.title],
       }));
     } catch (error) {
-      console.error(`Error processing media with title ${media.title}:`, error);
-      templistofMedia[media.title] = [{
-        url: null,
-        text: `Error: ${error.message || "Unknown error"}`,
-        title: `Failed to load ${media.title}`,
-        isError: true
-      }];
-      setListofMedia((prev) => ({
-        ...prev,
-        [media.title]: templistofMedia[media.title],
-      }));
+      handleGlobalError(error, media.title); // Pass the media title to the error handler
+    } finally {
+      setLoadingFeeds((prev) => ({ ...prev, [media.title]: false }));
     }
-    setLoadingFeeds((prev) => ({ ...prev, [media.title]: false }));
   };
 
   const fetchMediaFromAPI = async (media) => {
@@ -704,9 +708,13 @@ function VideoPlayer({
             <p>Loading media...</p>
           </div>
         ) : currentMedia && currentMedia.isError ? (
-          <div className="VideoPlayer__error">
-            <h3>{currentMedia.title}</h3>
-            <p>{currentMedia.text}</p>
+          <div className="VideoPlayer__error" style={{ background: "none", padding: 0 }}>
+            <img
+              src="src/assets/images/intro-landscape.jpg"
+              alt="Error Placeholder"
+              className="placeholder-image"
+              style={{ display: "block", width: "100%", height: "auto" }} // Ensure the image takes full space
+            />
           </div>
         ) : currentMedia && currentMedia.url ? (
           isImageFile(currentMedia.url) ? (
@@ -715,6 +723,10 @@ function VideoPlayer({
               className="video-image image-file"
               src={currentMedia.url}
               alt={currentMedia.title || "Media"}
+              onError={() => {
+                console.error("Error loading image:", currentMedia.url);
+                handleGlobalError(new Error("Image failed to load"), currentMedia.title);
+              }}
               onLoad={() => {
                 if (imageRef.current && containerRef.current) {
                 const image = imageRef.current;
@@ -766,7 +778,12 @@ function VideoPlayer({
           )
         ) : (
           <div className="VideoPlayer__no-media">
-            <p>No media available (You may have exceeded the maximum.)</p>
+            <img
+              src="src/assets/images/intro-a.jpg"
+              alt="Feed Player Placeholder"
+              className="placeholder-image"
+              style={{ display: "block", width: "100%", height: "auto" }} // Ensure the image takes full space
+            />
           </div>
         )}
         {selectedMediaList.length > 1 && (
