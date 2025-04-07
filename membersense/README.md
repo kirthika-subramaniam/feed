@@ -1,20 +1,18 @@
+[FeedPlayer](../)
 # MemberSense Discord Integration
 
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
-![SASS](https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white) ![SASS](https://img.shields.io/badge/Sass-CC6699?style=for-the-badge&logo=sass&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
 
-MemberSense Discord Integration is a modern, responsive web application that combines a video player with team member overviews and channel viewing capabilities. Our frontend-focused project showcases smooth transitions, fullscreen support, and interactive user interfaces.
+DreamStudio's MemberSense Discord Integration is a modern, responsive web application that combines a video player with team member overviews and channel viewing capabilities. Our frontend-focused project showcases smooth transitions, fullscreen support, and interactive user interfaces.
 
 Also see [Backend Setup](https://github.com/ModelEarth/members)
 
 ## Features
 
-- 🎥 Video Player with popup support
 - 👥 Member Showcase with dynamic grid layout
 - 💬 Discord-style Channel Viewer
 - 🔐 Token-based authentication
+- 🎥 Video Player / Swiper Integration
 - 🖥️ Fullscreen mode with adaptive layout
 - 🌓 Smooth transitions between views
 - 🔍 Member search functionality

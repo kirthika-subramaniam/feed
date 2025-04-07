@@ -1,13 +1,11 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Context } from "../Context/ContextGoogle";
-import { VideoContext } from "../Context/Context";
 import { formatTime } from "../utils/formatTime";
 import "./VideoPlayer.scss";
 import axios from "axios";
 import PropTypes from "prop-types";
 import { FaChevronUp, FaChevronDown, FaPlay, FaPause } from "react-icons/fa";
 import Popup from "../components/Popup/Popup";
-import { Link, Check, MoreHorizontal } from "lucide-react";
 
 function VideoPlayer({
   autoplay = false,
@@ -21,7 +19,6 @@ function VideoPlayer({
 }) {
   // The numbers here are the states to see in React Developer Tools
   const { mediaList, currentMedia, setCurrentMedia } = useContext(Context); // 0
-  const { setVideoList, setCurrentVideoSrc } = useContext(VideoContext); // 0
   const [isPlaying, setIsPlaying] = useState(autoplay); // 1
   const [currentVolume, setCurrentVolume] = useState(1); // 2
   const [isMute, setIsMute] = useState(true); // 3
@@ -48,6 +45,9 @@ function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true); // 21
   const [activeFeed, setActiveFeed] = useState("nasa"); // 22
   const [isExpanded, setIsExpanded] = useState(false); // 23
+  const imageRef = useRef(null); // 24
+  const [isTallImage, setIsTallImage] = useState(false); // 25
+  const [videoData, setVideoData] = useState(null); // 26
 
   const imageDuration = 4;
 
@@ -76,32 +76,6 @@ function VideoPlayer({
       ref: parseInt(params.get("ref"), 10) || 0, // Default to 0 if ref is not valid
     };
   };
-
-  // const handlePopupClick = () => {
-  //   setSelectedOption("");
-  //   setIsMenu(true);
-  //   pause();
-  // };
-
-  // const handleMenuClick = (option) => {
-  //   setIsMenu(false);
-  //   setSelectedOption(option);
-  //   play();
-  // };
-
-  // // Click outside to close the menu
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     // If menuRef exists and the click is NOT inside it, close the menu
-  //     if (menuRef.current && !menuRef.current.contains(event.target)) {
-  //       setIsMenu(false);
-  //       play();
-  //     }
-  //   };
-
-  //   if (isMenu) document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, [isMenu]);
 
   useEffect(() => {
     if (currentMedia && selectedMediaList.length > 0) updateURLHash(mediaList[index].feed, currentMediaIndex);
@@ -149,6 +123,26 @@ function VideoPlayer({
     };
     processSwiperData();
   }, [swiperData]);
+
+  useEffect(() => {
+    const processVideoData = async () => {
+      setIsLoading(true);
+      const templistofMedia = {};
+      const linkedVideoFeed = mediaList.find((media) => media.feed.trim().toLowerCase() === "linkedvideo");
+      if (linkedVideoFeed) {
+        await loadFeed(linkedVideoFeed, templistofMedia);
+        setIndex(9);
+        setCurrentMediaIndex(0);
+        setLoadedFeeds(["linkedvideo"]);
+        setListofMedia(templistofMedia);
+        setSelectedMediaList(templistofMedia[linkedVideoFeed.title]);
+        setCurrentMedia(templistofMedia[linkedVideoFeed.title][0]);
+        setActiveFeed("linkedvideo");
+      }
+      setIsLoading(false);
+    };
+    processVideoData();
+  }, [videoData]);
 
   useEffect(() => {
     const { feed, ref } = parseHash();
@@ -243,9 +237,22 @@ function VideoPlayer({
     setIsLoading(false);
   };
 
+  const handleGlobalError = (error, mediaTitle = "Error") => {
+    console.error("Global error handler triggered:", error);
+    const placeholderMedia = {
+      url: "src/assets/images/intro-landscape.jpg", // Placeholder image
+      text: error.message || "An unknown error occurred", // Use the specific error message
+      title: `Failed to load ${mediaTitle}`, // Display the media title with the error
+      isError: true 
+    };
+    setSelectedMediaList([placeholderMedia]); // Set placeholder as the selected media
+    setCurrentMedia(placeholderMedia); // Set placeholder as the current media
+  };
+
+  // Wrap the loadFeed function to pass the media title to the global error handler
   const loadFeed = async (media, templistofMedia) => {
-    setLoadingFeeds((prev) => ({ ...prev, [media.title]: true }));
     try {
+      setLoadingFeeds((prev) => ({ ...prev, [media.title]: true }));
       const mediaItems = await fetchMediaFromAPI(media);
       templistofMedia[media.title] = Array.isArray(mediaItems) ? mediaItems : [mediaItems];
       setLoadedFeeds((prev) => [...prev, media.feed.trim().toLowerCase()]);
@@ -254,20 +261,43 @@ function VideoPlayer({
         [media.title]: templistofMedia[media.title],
       }));
     } catch (error) {
-      console.error(`Error processing media with title ${media.title}:`, error);
-      templistofMedia[media.title] = [];
+      handleGlobalError(error, media.title); // Pass the media title to the error handler
+    } finally {
+      setLoadingFeeds((prev) => ({ ...prev, [media.title]: false }));
     }
-    setLoadingFeeds((prev) => ({ ...prev, [media.title]: false }));
   };
 
   const fetchMediaFromAPI = async (media) => {
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
+        if(!swiperData) {
+          return {
+            url: null,
+            text: "Please click on a Swiper Image to view",
+            title: `Failed to load ${media.title}`,
+            isError: true,
+          }
+        }
         return {
           url: swiperData.url,
           text: swiperData.text || "No description available",
           title: swiperData.title,
+        };
+      }
+      if (media.feed.trim().toLowerCase() === "linkedvideo") {
+        if(!videoData) {
+          return {
+            url: null,
+            text: "Please upload a video link to view",
+            title: `Failed to load ${media.title}`,
+            isError: true,
+          }
+        }
+        return {
+          url: videoData.url,
+          text: videoData.text,
+          title: videoData.title,
         };
       }
       const response = await axios.get(media.url);
@@ -335,7 +365,14 @@ function VideoPlayer({
       }
     } catch (error) {
       console.error("Error fetching from API for", media.title, ":", error);
-      return [];
+      return [
+        {
+          url: null,
+          text: `Error: ${error.message || "Unknown error"}`,
+          title: `Failed to load ${media.title}`,
+          isError: true,
+        },
+      ];
     }
   };
 
@@ -642,6 +679,43 @@ function VideoPlayer({
     };
   }, [setIsFullScreen]);
 
+  useEffect(() => {
+    const recalcImageScale = () => {
+      if (imageRef.current && containerRef.current) {
+        const image = imageRef.current;
+        const container = containerRef.current;
+        const naturalWidth = image.naturalWidth;
+        const naturalHeight = image.naturalHeight;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        const scaleWidth = containerWidth / naturalWidth;
+        const scaleHeight = containerHeight / naturalHeight;
+        const scaleFactor = Math.max(scaleWidth, scaleHeight);
+        const scaledWidth = naturalWidth * scaleFactor;
+        const scaledHeight = naturalHeight * scaleFactor;
+        image.style.width = `${scaledWidth}px`;
+        image.style.height = `${scaledHeight}px`;
+        const extraWidth = scaledWidth - containerWidth;
+        image.style.marginLeft = extraWidth ? `-${extraWidth / 2}px` : "0";
+        image.style.marginTop = "0";
+        const extraHeight = scaledHeight - containerHeight;
+        if (extraHeight > 0) {
+          image.style.setProperty("--pan-distance", `${extraHeight}px`);
+          image.classList.add("pan-vertical");
+        } else {
+          image.classList.remove("pan-vertical");
+        }
+      }
+    };
+    window.addEventListener("resize", recalcImageScale);
+    window.addEventListener("fullscreenchange", recalcImageScale);
+
+    return () => {
+      window.removeEventListener("resize", recalcImageScale);
+      window.removeEventListener("fullscreenchange", recalcImageScale);
+    };
+  }, []);
+
   return (
     <div className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`} ref={containerRef}>
       <div className="VideoPlayer__video-container" onMouseLeave={handleMouseLeave}>
@@ -650,14 +724,53 @@ function VideoPlayer({
             <div className="spinner"></div>
             <p>Loading media...</p>
           </div>
+        ) : currentMedia && currentMedia.isError ? (
+          <div className="VideoPlayer__error" style={{ background: "none", padding: 0 }}>
+            <img
+              src="src/assets/images/intro-landscape.jpg"
+              alt="Error Placeholder"
+              className="placeholder-image"
+              style={{ display: "block", width: "100%", height: "auto" }} // Ensure the image takes full space
+            />
+          </div>
         ) : currentMedia && currentMedia.url ? (
           isImageFile(currentMedia.url) ? (
-            <img className="video-image" src={currentMedia.url} alt={currentMedia.title || "Media"} />
+            <img
+              ref={imageRef}
+              className="video-image image-file"
+              src={currentMedia.url}
+              alt={currentMedia.title || "Media"}
+              onError={() => {
+                console.error("Error loading image:", currentMedia.url);
+                handleGlobalError(new Error("Image failed to load"), currentMedia.title);
+              }}
+              onLoad={() => {
+                if (imageRef.current && containerRef.current) {
+                  const image = imageRef.current;
+                  const container = containerRef.current;
+                  const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
+                  const { naturalWidth, naturalHeight } = image;
+                  const scaleFactor = Math.max(containerWidth / naturalWidth, containerHeight / naturalHeight);
+                  const scaledWidth = naturalWidth * scaleFactor;
+                  const scaledHeight = naturalHeight * scaleFactor;
+
+                  image.style.width = `${scaledWidth}px`;
+                  image.style.height = `${scaledHeight}px`;
+                  const overflow = scaledHeight - containerHeight;
+                  if (overflow > 0) {
+                    image.style.setProperty("--pan-distance", `${overflow}px`);
+                    image.classList.add("pan-vertical");
+                  } else {
+                    image.classList.remove("pan-vertical");
+                  }
+                }
+              }}
+            />
           ) : isVideoFile(currentMedia.url) ? (
             <div className="video-wrapper">
               <video
                 ref={videoRef}
-                className="video-image"
+                className="video-image video-file"
                 src={currentMedia.url}
                 poster="src/assets/images/intro-a.jpg"
                 muted={isMute}
@@ -682,7 +795,12 @@ function VideoPlayer({
           )
         ) : (
           <div className="VideoPlayer__no-media">
-            <p>No media available (You may have exceeded the maximum.)</p>
+            <img
+              src="src/assets/images/intro-a.jpg"
+              alt="Feed Player Placeholder"
+              className="placeholder-image"
+              style={{ display: "block", width: "100%", height: "auto" }} // Ensure the image takes full space
+            />
           </div>
         )}
         {selectedMediaList.length > 1 && (
@@ -734,7 +852,7 @@ function VideoPlayer({
             </div>
           </div>
         )}
-        {selectedOption === "url" && <Popup {...{ setVideoList, setCurrentVideoSrc, setSelectedOption }} />}
+        {selectedOption === "url" && <Popup {...{ setVideoData, setSelectedOption }} />}
         {selectedOption === "feeds" && (
           <div className="VideoPlayer__dropdown">
             <div className="VideoPlayer__select" onClick={() => setIsDropdownActive(!isDropdownActive)}>
@@ -804,7 +922,8 @@ function VideoPlayer({
                 min={0}
               />
               <span className="time">
-                {currentTime[0]}:{String(currentTime[1]).padStart(2,"0")} / {duration[0]}:{String(duration[1]).padStart(2,"0")}
+                {currentTime[0]}:{String(currentTime[1]).padStart(2, "0")} / {duration[0]}:
+                {String(duration[1]).padStart(2, "0")}
               </span>
             </>
           )}

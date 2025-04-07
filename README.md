@@ -35,7 +35,7 @@ DONE: Add columns for Title and Description in the Google Sheet - Matt B
 
 3.) DONE: New swiper control and text that scrolls in player. - Shreyas
 
-4.) TO DO: When an image is narrower than the player, span 100% while retaining the image's ratio. Have the image slowly pan from the top to bottom when portions of it exceed the player height.
+4.) DONE: When an image is narrower than the player, span 100% while retaining the image's ratio. Have the image slowly pan from the top to bottom when portions of it exceed the player height. - Karthik
 
 5.) DONE: Show the progress bar for the feed images. Update the progress bar to include multiple clickable sections when there are sequences of images. We could tap Matt B. who worked with the progress bar previously. - Shreyas
 
@@ -125,7 +125,7 @@ website
    └─ .gitignore
 ```
 
-Aslo see the [MemberSense directory structure](https://github.com/ModelEarth/feed/blob/main/MemberSense.md).
+Also see the [MemberSense directory structure](membersense).
 
 ## Edit and build the "feed" project locally
 
