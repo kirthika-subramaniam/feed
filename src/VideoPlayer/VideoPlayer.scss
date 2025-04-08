@@ -413,7 +413,7 @@
 
     .control-group-volume {
       width: 25%;
-      justify-content: space-evenly;
+      justify-content: flex-end;
       gap: 0.5rem;
       @include customize-range-input(5px);
 
