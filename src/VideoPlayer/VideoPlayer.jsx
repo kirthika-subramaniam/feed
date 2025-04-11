@@ -243,7 +243,7 @@ function VideoPlayer({
       url: "src/assets/images/intro-landscape.jpg", // Placeholder image
       text: error.message || "An unknown error occurred", // Use the specific error message
       title: `Failed to load ${mediaTitle}`, // Display the media title with the error
-      isError: true 
+      isError: true,
     };
     setSelectedMediaList([placeholderMedia]); // Set placeholder as the selected media
     setCurrentMedia(placeholderMedia); // Set placeholder as the current media
@@ -271,13 +271,13 @@ function VideoPlayer({
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
       if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
-        if(!swiperData) {
+        if (!swiperData) {
           return {
             url: null,
             text: "Please click on a Swiper Image to view",
             title: `Failed to load ${media.title}`,
             isError: true,
-          }
+          };
         }
         return {
           url: swiperData.url,
@@ -286,13 +286,13 @@ function VideoPlayer({
         };
       }
       if (media.feed.trim().toLowerCase() === "linkedvideo") {
-        if(!videoData) {
+        if (!videoData) {
           return {
             url: null,
             text: "Please upload a video link to view",
             title: `Failed to load ${media.title}`,
             isError: true,
-          }
+          };
         }
         return {
           url: videoData.url,
@@ -789,8 +789,16 @@ function VideoPlayer({
               )}
             </div>
           ) : (
-            <div className="VideoPlayer__unsupported-media">
-              <p>Unsupported media type</p>
+            <div className="VideoPlayer__unsupported-media" style={{ background: "none", padding: 0 }}>
+              <img
+                src="src/assets/images/intro-landscape.jpg"
+                alt="Error Placeholder"
+                className="placeholder-image"
+                style={{ display: "block", width: "100%", height: "auto" }}
+              />
+              <div className="unsupported-media-message">
+                Unsupported Media Type
+              </div>
             </div>
           )
         ) : (
@@ -799,7 +807,7 @@ function VideoPlayer({
               src="src/assets/images/intro-a.jpg"
               alt="Feed Player Placeholder"
               className="placeholder-image"
-              style={{ display: "block", width: "100%", height: "auto" }} // Ensure the image takes full space
+              style={{ display: "block", width: "100%", height: "auto" }}
             />
           </div>
         )}
@@ -929,22 +937,23 @@ function VideoPlayer({
           )}
         </div>
         <div className="control-group control-group-volume">
-          { currentMedia && isVideoFile(currentMedia.url) && <>
-            <button className="control-button volume" onClick={handleMute}>
-              <i className={`ri-volume-${isMute ? "mute" : "up"}-fill`}></i>
-            </button>
-            <input
-              type="range"
-              className="range-input"
-              ref={volumeRangeRef}
-              max={1}
-              min={0}
-              value={currentVolume}
-              onChange={handleVolumeRange}
-              step={0.1}
-            />
-          </>
-          }
+          {currentMedia && isVideoFile(currentMedia.url) && (
+            <>
+              <button className="control-button volume" onClick={handleMute}>
+                <i className={`ri-volume-${isMute ? "mute" : "up"}-fill`}></i>
+              </button>
+              <input
+                type="range"
+                className="range-input"
+                ref={volumeRangeRef}
+                max={1}
+                min={0}
+                value={currentVolume}
+                onChange={handleVolumeRange}
+                step={0.1}
+              />
+            </>
+          )}
           <button className="control-button full-screen" onClick={toggleFullScreen}>
             <i className={`ri-${isFullScreen ? "fullscreen-exit" : "fullscreen"}-line`}></i>
           </button>

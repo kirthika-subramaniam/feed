@@ -508,6 +508,7 @@
   background-color: #f0f0f0;
   color: #666;
 }
+
 .VideoPlayer__unsupported-media {
   display: flex;
   align-items: center;
@@ -515,6 +516,18 @@
   height: 100%;
   background-color: #f0f0f0;
   color: #666;
+
+  .unsupported-media-message {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
 }
 
 .pan-vertical {
