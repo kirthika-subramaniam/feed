@@ -62,8 +62,8 @@
       </div>
     </div>
 
-    <object type="text/html" class="swiper-filmstrip" data="/swiper/dist/loop.html" scrolling="no"></object>
-    <object type="text/html" class="swiper-section" data="/swiper/dist/feedmain.html" scrolling="no"></object>
+    <object type="text/html" class="swiper-filmstrip" data="/swiper/dist/loop.html" scrolling="no" title="Nasa API Filmstrip Swiper"></object>
+    <object type="text/html" class="swiper-section" data="/swiper/dist/feedmain.html" scrolling="no" title="Nasa API Default Swiper"></object>
 
     <div class="content contentpadding large-list" style="padding-top: 0px">
       <div id="readmeDiv"></div>
@@ -134,14 +134,17 @@
       };
 
       // Set up event listeners
-      window.addEventListener("hashchange", handleHashChange);
-      window.addEventListener("message", handleMessage);
-
-      // Clean up function to prevent memory leaks
-      window.addEventListener("unload", () => {
+      function init() {
+        window.addEventListener("hashchange", handleHashChange);
+        window.addEventListener("message", handleMessage);
+        window.addEventListener("beforeunload", cleanup);
+      }
+      function cleanup() {
         window.removeEventListener("hashchange", handleHashChange);
         window.removeEventListener("message", handleMessage);
-      });
+        window.removeEventListener("beforeunload", cleanup);
+      }
+      init();
     </script>
   </body>
 </html>
