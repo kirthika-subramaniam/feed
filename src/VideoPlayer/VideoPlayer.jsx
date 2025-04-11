@@ -929,19 +929,22 @@ function VideoPlayer({
           )}
         </div>
         <div className="control-group control-group-volume">
-          <button className="control-button volume" onClick={handleMute}>
-            <i className={`ri-volume-${isMute ? "mute" : "up"}-fill`}></i>
-          </button>
-          <input
-            type="range"
-            className="range-input"
-            ref={volumeRangeRef}
-            max={1}
-            min={0}
-            value={currentVolume}
-            onChange={handleVolumeRange}
-            step={0.1}
-          />
+          { currentMedia && isVideoFile(currentMedia.url) && <>
+            <button className="control-button volume" onClick={handleMute}>
+              <i className={`ri-volume-${isMute ? "mute" : "up"}-fill`}></i>
+            </button>
+            <input
+              type="range"
+              className="range-input"
+              ref={volumeRangeRef}
+              max={1}
+              min={0}
+              value={currentVolume}
+              onChange={handleVolumeRange}
+              step={0.1}
+            />
+          </>
+          }
           <button className="control-button full-screen" onClick={toggleFullScreen}>
             <i className={`ri-${isFullScreen ? "fullscreen-exit" : "fullscreen"}-line`}></i>
           </button>
