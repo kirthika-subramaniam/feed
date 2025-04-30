@@ -25,6 +25,8 @@ Welcome to our FeedPlayer React Project! This project provides a modern and user
 
 Place your name here if you're working on an update.
 
+0.) Add a quick fade between slides, about half a second.
+
 1.) DONE: Provide the specific error than "No media available" for the second SeeClickFix link and others that don't load.  Add a CORS passthrough like we have in the view folder. - by snehit
 
 2.) DONE: Pull the image and video links from a Google Sheet by implementing the Content/ContextGoogle.jsx page which pulls from this [Google Sheet](https://docs.google.com/spreadsheets/d/1jQTlXWom-pXvyP9zuTcbdluyvpb43hu2h7anxhF5qlQ/edit?usp=sharing) - By Gary
