@@ -253,7 +253,24 @@ function VideoPlayer({
   const loadFeed = async (media, templistofMedia) => {
     try {
       setLoadingFeeds((prev) => ({ ...prev, [media.title]: true }));
-      const mediaItems = await fetchMediaFromAPI(media);
+      // Support pipe-separated URLs
+      let mediaItems = [];
+      if (media.url && media.url.includes("|")) {
+        // Split the URL string and fetch each feed, then combine
+        const urls = media.url.split("|").map((u) => u.trim()).filter(Boolean);
+        for (const url of urls) {
+          // Clone the media object but override the url
+          const mediaClone = { ...media, url };
+          const items = await fetchMediaFromAPI(mediaClone);
+          if (Array.isArray(items)) {
+            mediaItems = mediaItems.concat(items);
+          } else if (items) {
+            mediaItems.push(items);
+          }
+        }
+      } else {
+        mediaItems = await fetchMediaFromAPI(media);
+      }
       templistofMedia[media.title] = Array.isArray(mediaItems) ? mediaItems : [mediaItems];
       setLoadedFeeds((prev) => [...prev, media.feed.trim().toLowerCase()]);
       setListofMedia((prev) => ({
@@ -600,15 +617,6 @@ function VideoPlayer({
       console.log("Current media set: ", selectedMediaList[currentMediaIndex], "Index: ", currentMediaIndex);
     }
   }, [currentMediaIndex, mediaList, setCurrentMedia]);
-
-  useEffect(() => {
-    const removeHashOnRefresh = () => {
-      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
-      window.history.replaceState(null, "", currentURL); // Update the URL without the hash
-    };
-    window.addEventListener("beforeunload", removeHashOnRefresh);
-    return () => window.removeEventListener("beforeunload", removeHashOnRefresh);
-  }, []);
 
   useEffect(() => {
     if (selectedMediaList.length > 0 && !currentMedia) {
