@@ -381,11 +381,22 @@ function VideoPlayer({
           }));
       }
     } catch (error) {
-      console.error("Error fetching from API for", media.title, ":", error);
+      let errorMessage = "An unknown error occurred.";
+      if (error.response) {
+        if (error.response.status === 429) {
+          errorMessage = "NASA API rate limit exceeded (429). Please use your own API key for more requests. See https://api.nasa.gov/ for details.";
+        } else if (error.response.status === 400) {
+          errorMessage = "Bad request (400): Please check your API key or feed URL.";
+        } else {
+          errorMessage = `Request failed with status code ${error.response.status}`;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
       return [
         {
           url: null,
-          text: `Error: ${error.message || "Unknown error"}`,
+          text: `Error: ${errorMessage}`,
           title: `Failed to load ${media.title}`,
           isError: true,
         },
