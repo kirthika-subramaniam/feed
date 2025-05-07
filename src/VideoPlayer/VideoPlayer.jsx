@@ -289,44 +289,26 @@ function VideoPlayer({
   const fetchMediaFromAPI = async (media) => {
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
-      if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
-        if (!swiperData) {
-          return {
-            url: null,
-            text: "Please click on a Swiper Image to view",
-            title: `Failed to load ${media.title}`,
-            isError: true,
-          };
-        }
-        return {
-          url: swiperData.url,
-          text: swiperData.text || "No description available",
-          title: swiperData.title,
-        };
+      // Use localStorage lat/lon for SeeClickFix if present
+      let url = media.url;
+      if (media.feed.trim().toLowerCase() === "seeclickfix-311") {
+        const lat = localStorage.getItem('latitude') || '41.307';
+        const lon = localStorage.getItem('longitude') || '-72.925';
+        // Replace {latitude} and {longitude} placeholders if present
+        url = url.replace('{latitude}', lat).replace('{longitude}', lon);
       }
-      if (media.feed.trim().toLowerCase() === "linkedvideo") {
-        if (!videoData) {
-          return {
-            url: null,
-            text: "Please upload a video link to view",
-            title: `Failed to load ${media.title}`,
-            isError: true,
-          };
-        }
-        return {
-          url: videoData.url,
-          text: videoData.text,
-          title: videoData.title,
-        };
-      }
-      const response = await axios.get(media.url);
+      const response = await axios.get(url);
       switch (media.feed.trim().toLowerCase()) {
         case "seeclickfix-311":
-          return response.data.issues.map((item) => ({
-            url: item.media.image_full || item.media.representative_image_url,
-            text: item.description || "No description available",
-            title: item.summary,
-          }));
+          // Only show first 5 issues with images
+          return response.data.issues
+            .filter(item => item.media && (item.media.image_full || item.media.representative_image_url))
+            .slice(0, 5)
+            .map(item => ({
+              url: item.media.image_full || item.media.representative_image_url,
+              text: item.description || "No description available",
+              title: item.summary,
+            }));
         case "film-scouting":
           return response.data.flatMap((item) => {
             const photos = [];
