@@ -51,6 +51,8 @@ function VideoPlayer({
 
   const imageDuration = 4;
 
+  const [isFeedReady, setIsFeedReady] = useState(false); // NEW: Track if feed is ready
+
   const updateURLHash = (feed, ref) => {
     const existingParams = new URLSearchParams(window.location.hash.substring(1));
     const otherParams = new URLSearchParams(); // string containing all the extra params in the URL
@@ -734,6 +736,26 @@ function VideoPlayer({
       window.removeEventListener("fullscreenchange", recalcImageScale);
     };
   }, []);
+
+  useEffect(() => {
+    // Wait for hash or default feed to be processed before rendering
+    const { feed } = parseHash();
+    if (feed) {
+      setIsFeedReady(true);
+    } else {
+      // If no hash, set default feed and then mark as ready
+      setTimeout(() => setIsFeedReady(true), 0);
+    }
+  }, []);
+
+  if (!isFeedReady) {
+    return (
+      <div className="VideoPlayer__loading">
+        <div className="spinner"></div>
+        <p>Loading feed...</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`} ref={containerRef}>
