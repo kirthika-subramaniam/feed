@@ -212,7 +212,11 @@ function VideoPlayer({
 
   useEffect(() => {
     if (mediaList && mediaList.length > 0) {
-      processMediaList();
+      const hash = window.location.hash;
+      if (!hash || !hash.includes("feed=")) {
+        processMediaList();
+      }
+      // Otherwise, let the hash-handling useEffects load the correct feed
     }
   }, [mediaList]);
 
@@ -715,6 +719,14 @@ function VideoPlayer({
       window.removeEventListener("fullscreenchange", recalcImageScale);
     };
   }, []);
+
+  // Defensive hash handling: set hash to first feed if missing
+  useEffect(() => {
+    if (!window.location.hash || !window.location.hash.includes("feed=")) {
+      const defaultFeed = mediaList[0]?.feed || "seeclickfix-311";
+      window.location.hash = `feed=${defaultFeed}`;
+    }
+  }, [mediaList]);
 
   return (
     <div className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`} ref={containerRef}>
