@@ -606,15 +606,6 @@ function VideoPlayer({
   }, [currentMediaIndex, mediaList, setCurrentMedia]);
 
   useEffect(() => {
-    const removeHashOnRefresh = () => {
-      const currentURL = window.location.href.split("#")[0]; // Get the URL without the hash
-      window.history.replaceState(null, "", currentURL); // Update the URL without the hash
-    };
-    window.addEventListener("beforeunload", removeHashOnRefresh);
-    return () => window.removeEventListener("beforeunload", removeHashOnRefresh);
-  }, []);
-
-  useEffect(() => {
     if (selectedMediaList.length > 0 && !currentMedia) {
       setCurrentMediaIndex(0);
       setCurrentMedia(selectedMediaList[0]);
