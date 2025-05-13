@@ -211,12 +211,31 @@ function VideoPlayer({
   }, [mediaList, listofMedia]);
 
   useEffect(() => {
+    console.log("[DEBUG] mediaList on mount:", mediaList);
+    console.log("[DEBUG] window.location.hash on mount:", window.location.hash);
+  }, []);
+
+  useEffect(() => {
     if (mediaList && mediaList.length > 0) {
       const hash = window.location.hash;
+      console.log("[DEBUG] useEffect [mediaList]: hash=", hash, "mediaList=", mediaList.map(m => m.feed));
       if (!hash || !hash.includes("feed=")) {
+        console.log("[DEBUG] No feed in hash, calling processMediaList (NASA fallback)");
         processMediaList();
+      } else {
+        console.log("[DEBUG] Feed found in hash, not calling NASA fallback");
       }
       // Otherwise, let the hash-handling useEffects load the correct feed
+    }
+  }, [mediaList]);
+
+  useEffect(() => {
+    const { feed } = parseHash();
+    console.log("[DEBUG] useEffect [mediaList] (hash feed): feed from hash=", feed);
+    if (feed) {
+      const selectedFeed = mediaList.find((media) => media.feed.trim().toLowerCase() === feed.toLowerCase());
+      console.log("[DEBUG] selectedFeed from hash:", selectedFeed);
+      if (selectedFeed) setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
     }
   }, [mediaList]);
 
