@@ -730,6 +730,14 @@ function VideoPlayer({
     }
   }, []);
 
+  // Defensive hash handling: set hash to first feed if missing
+  useEffect(() => {
+    if (!window.location.hash || !window.location.hash.includes("feed=")) {
+      const defaultFeed = mediaList[0]?.feed || "nasa";
+      window.location.hash = `feed=${defaultFeed}`;
+    }
+  }, [mediaList]);
+
   if (!isFeedReady) {
     return (
       <div className="VideoPlayer__loading">
