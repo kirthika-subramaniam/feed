@@ -35,10 +35,14 @@ function buildFeedMap(feedUrls: string) {
   }, {} as Record<string, string>);
 }
 
-function getFeedFromHash() {
+function getFeedFromHash(feedTypes: string[]) {
   if (window.location.hash && window.location.hash.includes('feed=')) {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-    return params.get('feed');
+    const feedParam = params.get('feed');
+    if (!feedParam) return null;
+    // Try to match the start of any feedType
+    const matchedType = feedTypes.find(type => feedParam.startsWith(type));
+    return matchedType || null;
   }
   return null;
 }
@@ -59,14 +63,14 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   // On mount, handle hash/feed logic
   useEffect(() => {
     if (feedTypes.length === 0) return;
-    const feedFromHash = getFeedFromHash();
+    const feedFromHash = getFeedFromHash(feedTypes);
     console.log('[DEBUG] feedTypes:', feedTypes);
     console.log('[DEBUG] feed from hash:', feedFromHash);
-    if (feedFromHash && feedTypes.includes(feedFromHash)) {
+    if (feedFromHash) {
       setActiveFeed(feedFromHash);
       // DO NOT setFeedHash here!
-    } else if (!feedFromHash) {
-      // Only set default if hash is missing
+    } else {
+      // Only set default if hash is missing or invalid
       const defaultFeedType = feedTypes[0];
       setActiveFeed(defaultFeedType);
       setFeedHash(defaultFeedType);
@@ -77,7 +81,7 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   // Listen for hash changes and update activeFeed
   useEffect(() => {
     const onHashChange = () => {
-      const feedFromHash = getFeedFromHash();
+      const feedFromHash = getFeedFromHash(feedTypes);
       console.log('[DEBUG] Hash changed, new feed:', feedFromHash);
       if (feedFromHash && feedTypes.includes(feedFromHash)) {
         setActiveFeed(feedFromHash);
