@@ -60,12 +60,14 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   const feedMap = buildFeedMap(feedUrls);
   const feedTypes = Object.keys(feedMap);
 
-  // On mount, handle hash/feed logic
+  console.log('[DEBUG] feedMap:', feedMap);
+  console.log('[DEBUG] feedTypes:', feedTypes);
+  console.log('[DEBUG] activeFeed before set:', activeFeed);
+
   useEffect(() => {
-    if (feedTypes.length === 0) return;
     const feedFromHash = getFeedFromHash(feedTypes);
-    console.log('[DEBUG] feedTypes:', feedTypes);
-    console.log('[DEBUG] feed from hash:', feedFromHash);
+    console.log('[DEBUG] useEffect feedFromHash:', feedFromHash);
+    if (feedTypes.length === 0) return;
     if (feedFromHash) {
       setActiveFeed(feedFromHash);
       // DO NOT setFeedHash here!
