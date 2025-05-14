@@ -19,7 +19,14 @@ interface FeedItem {
   [key: string]: any; // Allow for dynamic fields
 }
 
-// Build a mapping of feed types to URLs
+function detectFeedType(url: string): string {
+  if (url.includes('api.nasa.gov')) return 'nasa';
+  if (url.includes('seeclickfix.com')) return 'seeclickfix';
+  if (url.includes('bsky.app')) return 'bsky';
+  if (url.includes('docs.google.com/spreadsheets')) return 'googlesheet';
+  return 'default';
+}
+
 function buildFeedMap(feedUrls: string) {
   return feedUrls.split('|').reduce((acc, url) => {
     const type = detectFeedType(url.trim());
@@ -28,7 +35,6 @@ function buildFeedMap(feedUrls: string) {
   }, {} as Record<string, string>);
 }
 
-// Hash/feed handling and debug logs
 function getFeedFromHash() {
   if (window.location.hash && window.location.hash.includes('feed=')) {
     const params = new URLSearchParams(window.location.hash.substring(1));
@@ -50,73 +56,6 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   const feedMap = buildFeedMap(feedUrls);
   const feedTypes = Object.keys(feedMap);
 
-  const processFeedItem = (item: any, type: string, sourceUrl: string): FeedItem => {
-    switch (type.toLowerCase()) {
-      case 'nasa':
-        return {
-          title: item.title,
-          description: item.explanation,
-          url: item.url,
-          date: item.date,
-          media_type: item.media_type,
-          source: 'NASA APOD'
-        };
-      
-      case 'seeclickfix':
-        return {
-          title: item.summary || item.title,
-          description: item.description,
-          url: item.html_url || item.url,
-          date: item.created_at || item.date,
-          source: 'SeeClickFix',
-          media_type: 'text'
-        };
-
-      case 'bsky':
-        return {
-          title: item.title,
-          description: item.content || item.description,
-          url: item.link || item.url,
-          date: item.pubDate || item.date,
-          source: 'BlueSky',
-          media_type: 'text'
-        };
-
-      default:
-        const processedItem: FeedItem = { source: sourceUrl };
-        if (feedFields.length > 0) {
-          feedFields.forEach(field => {
-            processedItem[field] = item[field];
-          });
-        } else {
-          Object.assign(processedItem, item);
-        }
-        return processedItem;
-    }
-  };
-
-  const detectFeedType = (url: string): string => {
-    if (url.includes('api.nasa.gov')) return 'nasa';
-    if (url.includes('seeclickfix.com')) return 'seeclickfix';
-    if (url.includes('bsky.app')) return 'bsky';
-    if (url.includes('docs.google.com/spreadsheets')) return 'googlesheet';
-    return 'default';
-  };
-
-  const processGoogleSheetUrl = (url: string): string => {
-    // If URL is already in the correct format, return as is
-    if (url.includes('/pub?') || url.includes('/gviz/tq?')) {
-      return url;
-    }
-
-    // Extract sheet ID and convert to proper format
-    const matches = url.match(/\/d\/(.*?)(\/|$)/);
-    if (matches && matches[1]) {
-      return `https://docs.google.com/spreadsheets/d/${matches[1]}/gviz/tq?tqx=out:csv`;
-    }
-    return url;
-  };
-
   // On mount, handle hash/feed logic
   useEffect(() => {
     if (feedTypes.length === 0) return;
@@ -125,6 +64,7 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
     console.log('[DEBUG] feed from hash:', feedFromHash);
     if (feedFromHash && feedTypes.includes(feedFromHash)) {
       setActiveFeed(feedFromHash);
+      console.log('[DEBUG] Set activeFeed from hash:', feedFromHash);
     } else {
       // Default to first feed type and set hash
       const defaultFeedType = feedTypes[0];
@@ -138,6 +78,7 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   useEffect(() => {
     const onHashChange = () => {
       const feedFromHash = getFeedFromHash();
+      console.log('[DEBUG] Hash changed, new feed:', feedFromHash);
       if (feedFromHash && feedTypes.includes(feedFromHash)) {
         setActiveFeed(feedFromHash);
       }
@@ -149,8 +90,9 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   // Handler for feed selection
   const handleFeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newFeedType = e.target.value;
-    setFeedHash(newFeedType);
+    setFeedHash(newFeedType); // Only update the hash
     // Do NOT call setActiveFeed here; let the hashchange event handle it
+    console.log('[DEBUG] Dropdown changed, set hash to:', newFeedType);
   };
 
   useEffect(() => {
@@ -159,30 +101,33 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
         if (!activeFeed) return;
         const selectedUrl = feedMap[activeFeed] || Object.values(feedMap)[0];
         if (!selectedUrl) throw new Error('No matching feed found for activeFeed');
-
-        const feedType = detectFeedType(selectedUrl);
-        const url = feedType === 'googlesheet' ? processGoogleSheetUrl(selectedUrl) : selectedUrl;
-
+        const type = detectFeedType(selectedUrl);
+        let url = selectedUrl;
+        if (type === 'googlesheet') {
+          // Convert to CSV format if needed
+          if (!url.includes('/gviz/tq?')) {
+            const matches = url.match(/\/d\/(.*?)(\/|$)/);
+            if (matches && matches[1]) {
+              url = `https://docs.google.com/spreadsheets/d/${matches[1]}/gviz/tq?tqx=out:csv`;
+            }
+          }
+        }
+        console.log('[DEBUG] Fetching feed:', type, url);
         const response = await axios.get(url);
         let data = response.data;
-
         let items: FeedItem[] = [];
-        switch (feedType) {
+        switch (type) {
           case 'nasa':
             data = Array.isArray(data) ? data : [data];
-            items = data.map((item: any) => processFeedItem(item, 'nasa', url));
+            items = data.map((item: any) => ({ ...item, source: 'NASA APOD' }));
             break;
           case 'seeclickfix':
             const issues = response.data.issues || response.data;
-            items = Array.isArray(issues)
-              ? issues.map((item: any) => processFeedItem(item, 'seeclickfix', url))
-              : [];
+            items = Array.isArray(issues) ? issues.map((item: any) => ({ ...item, source: 'SeeClickFix' })) : [];
             break;
           case 'bsky':
             const itemsArr = response.data.items || response.data;
-            items = Array.isArray(itemsArr)
-              ? itemsArr.map((item: any) => processFeedItem(item, 'bsky', url))
-              : [];
+            items = Array.isArray(itemsArr) ? itemsArr.map((item: any) => ({ ...item, source: 'BlueSky' })) : [];
             break;
           case 'googlesheet':
             const rows = data.split('\n').map((row: string) => row.split(','));
@@ -192,27 +137,26 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
               headers.forEach((header: string, index: number) => {
                 item[header.trim()] = row[index]?.trim() || '';
               });
-              return processFeedItem(item, 'googlesheet', url);
+              return { ...item, source: 'GoogleSheet' };
             });
             break;
           default:
             items = Array.isArray(data) ? data : [data];
         }
-
         if (items.length === 0) throw new Error('No feed data available');
         setFeeds(items);
         setLoading(false);
+        console.log('[DEBUG] Feed items loaded:', items.length);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch feed data');
         setLoading(false);
         console.error('Feed fetch error:', err);
       }
     };
-
     if (activeFeed) {
       fetchFeeds();
     }
-  }, [feedUrls, feedType, feedFields, activeFeed]);
+  }, [feedUrls, activeFeed]);
 
   if (loading) {
     return (
@@ -232,7 +176,6 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
 
   return (
     <>
-      {/* Feed selection dropdown */}
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
         <select value={activeFeed || ''} onChange={handleFeedChange} style={{ fontSize: '1rem', padding: '0.5rem' }}>
           {feedTypes.map(type => (
@@ -242,7 +185,6 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
           ))}
         </select>
       </Box>
-      {/* Existing feed display */}
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {feeds.map((item, index) => (
           <Box key={index} sx={{ width: { xs: '100%', md: '50%' }, p: 1.5 }}>
