@@ -19,10 +19,36 @@ interface FeedItem {
   [key: string]: any; // Allow for dynamic fields
 }
 
+// Build a mapping of feed types to URLs
+function buildFeedMap(feedUrls: string) {
+  return feedUrls.split('|').reduce((acc, url) => {
+    const type = detectFeedType(url.trim());
+    acc[type] = url.trim();
+    return acc;
+  }, {} as Record<string, string>);
+}
+
+// Hash/feed handling and debug logs
+function getFeedFromHash() {
+  if (window.location.hash && window.location.hash.includes('feed=')) {
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    return params.get('feed'); // returns 'nasa', 'seeclickfix', etc.
+  }
+  return null;
+}
+
+function setFeedHash(feedType: string) {
+  window.location.hash = `feed=${encodeURIComponent(feedType)}`;
+}
+
 const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default', feedFields = [] }) => {
   const [feeds, setFeeds] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeFeed, setActiveFeed] = useState<string | null>(null);
+
+  const feedMap = buildFeedMap(feedUrls);
+  const feedTypes = Object.keys(feedMap);
 
   const processFeedItem = (item: any, type: string, sourceUrl: string): FeedItem => {
     switch (type.toLowerCase()) {
@@ -91,81 +117,90 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
     return url;
   };
 
+  // On mount, handle hash/feed logic
+  useEffect(() => {
+    if (feedTypes.length === 0) return;
+    const feedFromHash = getFeedFromHash();
+    console.log('[DEBUG] feedTypes:', feedTypes);
+    console.log('[DEBUG] feed from hash:', feedFromHash);
+    if (feedFromHash && feedTypes.includes(feedFromHash)) {
+      setActiveFeed(feedFromHash);
+    } else {
+      // Default to first feed type and set hash
+      const defaultFeedType = feedTypes[0];
+      setActiveFeed(defaultFeedType);
+      setFeedHash(defaultFeedType);
+      console.log('[DEBUG] No valid feed in hash, setting default feed and hash:', defaultFeedType);
+    }
+  }, [feedUrls]);
+
+  // Listen for hash changes and update activeFeed
+  useEffect(() => {
+    const onHashChange = () => {
+      const feedFromHash = getFeedFromHash();
+      if (feedFromHash && feedTypes.includes(feedFromHash)) {
+        setActiveFeed(feedFromHash);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [feedTypes]);
+
+  // Handler for feed selection
+  const handleFeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newFeedType = e.target.value;
+    setFeedHash(newFeedType);
+    // Do NOT call setActiveFeed here; let the hashchange event handle it
+  };
+
   useEffect(() => {
     const fetchFeeds = async () => {
       try {
-        // Split the URLs by pipe character and remove any whitespace
-        const urls = feedUrls.split('|')
-          .map(url => url.trim())
-          .filter(url => url)
-          .map(url => {
-            const feedType = detectFeedType(url);
-            return feedType === 'googlesheet' ? processGoogleSheetUrl(url) : url;
-          });
-        
-        if (urls.length === 0) {
-          throw new Error('No valid feed URLs provided');
+        if (!activeFeed) return;
+        const selectedUrl = feedMap[activeFeed] || Object.values(feedMap)[0];
+        if (!selectedUrl) throw new Error('No matching feed found for activeFeed');
+
+        const feedType = detectFeedType(selectedUrl);
+        const url = feedType === 'googlesheet' ? processGoogleSheetUrl(selectedUrl) : selectedUrl;
+
+        const response = await axios.get(url);
+        let data = response.data;
+
+        let items: FeedItem[] = [];
+        switch (feedType) {
+          case 'nasa':
+            data = Array.isArray(data) ? data : [data];
+            items = data.map((item: any) => processFeedItem(item, 'nasa', url));
+            break;
+          case 'seeclickfix':
+            const issues = response.data.issues || response.data;
+            items = Array.isArray(issues)
+              ? issues.map((item: any) => processFeedItem(item, 'seeclickfix', url))
+              : [];
+            break;
+          case 'bsky':
+            const itemsArr = response.data.items || response.data;
+            items = Array.isArray(itemsArr)
+              ? itemsArr.map((item: any) => processFeedItem(item, 'bsky', url))
+              : [];
+            break;
+          case 'googlesheet':
+            const rows = data.split('\n').map((row: string) => row.split(','));
+            const headers = rows[0];
+            items = rows.slice(1).map((row: string[]) => {
+              const item: Record<string, any> = {};
+              headers.forEach((header: string, index: number) => {
+                item[header.trim()] = row[index]?.trim() || '';
+              });
+              return processFeedItem(item, 'googlesheet', url);
+            });
+            break;
+          default:
+            items = Array.isArray(data) ? data : [data];
         }
 
-        // Fetch data from all URLs
-        const feedPromises = urls.map(async (url) => {
-          try {
-            const response = await axios.get(url);
-            let data = response.data;
-            const currentFeedType = feedType === 'mixed' ? detectFeedType(url) : feedType;
-
-            // Handle different feed types
-            switch (currentFeedType.toLowerCase()) {
-              case 'nasa':
-                data = Array.isArray(data) ? data : [data];
-                return data.map((item: Record<string, any>) => processFeedItem(item, 'nasa', url));
-              
-              case 'seeclickfix':
-                const issues = response.data.issues || response.data;
-                return Array.isArray(issues) 
-                  ? issues.map((item: Record<string, any>) => processFeedItem(item, 'seeclickfix', url))
-                  : [];
-
-              case 'bsky':
-                const items = response.data.items || response.data;
-                return Array.isArray(items)
-                  ? items.map((item: Record<string, any>) => processFeedItem(item, 'bsky', url))
-                  : [];
-
-              case 'googlesheet':
-                // Convert CSV data to array of objects
-                const rows = data.split('\n').map((row: string) => row.split(','));
-                const headers = rows[0];
-                return rows.slice(1).map((row: string[]) => {
-                  const item: Record<string, any> = {};
-                  headers.forEach((header: string, index: number) => {
-                    item[header.trim()] = row[index]?.trim() || '';
-                  });
-                  return processFeedItem(item, 'googlesheet', url);
-                });
-
-              default:
-                if (feedFields.length > 0) {
-                  return Array.isArray(data) 
-                    ? data.map(item => processFeedItem(item, 'default', url)) 
-                    : [processFeedItem(data, 'default', url)];
-                }
-                return Array.isArray(data) ? data : [data];
-            }
-          } catch (err) {
-            console.error(`Error fetching from ${url}:`, err);
-            return []; // Return empty array for failed feed instead of breaking all feeds
-          }
-        });
-
-        const results = await Promise.all(feedPromises);
-        const flattenedResults = results.flat();
-        
-        if (flattenedResults.length === 0) {
-          throw new Error('No feed data available');
-        }
-
-        setFeeds(flattenedResults);
+        if (items.length === 0) throw new Error('No feed data available');
+        setFeeds(items);
         setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch feed data');
@@ -174,8 +209,10 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
       }
     };
 
-    fetchFeeds();
-  }, [feedUrls, feedType, feedFields]);
+    if (activeFeed) {
+      fetchFeeds();
+    }
+  }, [feedUrls, feedType, feedFields, activeFeed]);
 
   if (loading) {
     return (
@@ -194,64 +231,77 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   }
 
   return (
-    <Grid container spacing={3} sx={{ mt: 2 }}>
-      {feeds.map((item, index) => (
-        <Box key={index} sx={{ width: { xs: '100%', md: '50%' }, p: 1.5 }}>
-          <Card>
-            {item.media_type === 'image' && item.url && (
-              <CardMedia
-                component="img"
-                height="300"
-                image={item.url}
-                alt={item.title || 'Feed image'}
-                sx={{ objectFit: 'contain' }}
-              />
-            )}
-            {item.media_type === 'video' && item.url && (
-              <iframe
-                width="100%"
-                height="300"
-                src={item.url}
-                title={item.title || 'Feed video'}
-                frameBorder="0"
-                allowFullScreen
-              />
-            )}
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                {item.title && (
-                  <Typography gutterBottom variant="h6" component="div">
-                    {item.title}
+    <>
+      {/* Feed selection dropdown */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+        <select value={activeFeed || ''} onChange={handleFeedChange} style={{ fontSize: '1rem', padding: '0.5rem' }}>
+          {feedTypes.map(type => (
+            <option key={type} value={type}>
+              {type.toUpperCase()} Feed
+            </option>
+          ))}
+        </select>
+      </Box>
+      {/* Existing feed display */}
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        {feeds.map((item, index) => (
+          <Box key={index} sx={{ width: { xs: '100%', md: '50%' }, p: 1.5 }}>
+            <Card>
+              {item.media_type === 'image' && item.url && (
+                <CardMedia
+                  component="img"
+                  height="300"
+                  image={item.url}
+                  alt={item.title || 'Feed image'}
+                  sx={{ objectFit: 'contain' }}
+                />
+              )}
+              {item.media_type === 'video' && item.url && (
+                <iframe
+                  width="100%"
+                  height="300"
+                  src={item.url}
+                  title={item.title || 'Feed video'}
+                  frameBorder="0"
+                  allowFullScreen
+                />
+              )}
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  {item.title && (
+                    <Typography gutterBottom variant="h6" component="div">
+                      {item.title}
+                    </Typography>
+                  )}
+                  {item.source && (
+                    <Chip 
+                      label={item.source} 
+                      size="small" 
+                      color={
+                        item.source === 'NASA APOD' ? 'primary' : 
+                        item.source === 'SeeClickFix' ? 'secondary' : 
+                        'default'
+                      }
+                      sx={{ ml: 1 }}
+                    />
+                  )}
+                </Box>
+                {item.description && (
+                  <Typography variant="body2" color="text.secondary">
+                    {item.description}
                   </Typography>
                 )}
-                {item.source && (
-                  <Chip 
-                    label={item.source} 
-                    size="small" 
-                    color={
-                      item.source === 'NASA APOD' ? 'primary' : 
-                      item.source === 'SeeClickFix' ? 'secondary' : 
-                      'default'
-                    }
-                    sx={{ ml: 1 }}
-                  />
+                {item.date && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Date: {item.date}
+                  </Typography>
                 )}
-              </Box>
-              {item.description && (
-                <Typography variant="body2" color="text.secondary">
-                  {item.description}
-                </Typography>
-              )}
-              {item.date && (
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                  Date: {item.date}
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Box>
-      ))}
-    </Grid>
+              </CardContent>
+            </Card>
+          </Box>
+        ))}
+      </Grid>
+    </>
   );
 };
 
