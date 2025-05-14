@@ -40,7 +40,7 @@ function getFeedFromHash(feedTypes: string[]) {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const feedParam = params.get('feed');
     if (!feedParam) return null;
-    // Try to match exact or prefix with dash
+    // Try to match exact or prefix (type or type-)
     for (const type of feedTypes) {
       if (feedParam === type || feedParam.startsWith(type + '-')) {
         return type;
