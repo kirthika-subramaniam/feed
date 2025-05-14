@@ -40,9 +40,13 @@ function getFeedFromHash(feedTypes: string[]) {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const feedParam = params.get('feed');
     if (!feedParam) return null;
-    // Try to match the start of any feedType
-    const matchedType = feedTypes.find(type => feedParam.startsWith(type));
-    return matchedType || null;
+    // Try to match exact or prefix with dash
+    for (const type of feedTypes) {
+      if (feedParam === type || feedParam.startsWith(type + '-')) {
+        return type;
+      }
+    }
+    return null;
   }
   return null;
 }
@@ -60,14 +64,12 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
   const feedMap = buildFeedMap(feedUrls);
   const feedTypes = Object.keys(feedMap);
 
-  console.log('[DEBUG] feedMap:', feedMap);
-  console.log('[DEBUG] feedTypes:', feedTypes);
-  console.log('[DEBUG] activeFeed before set:', activeFeed);
-
+  // On mount, handle hash/feed logic
   useEffect(() => {
-    const feedFromHash = getFeedFromHash(feedTypes);
-    console.log('[DEBUG] useEffect feedFromHash:', feedFromHash);
     if (feedTypes.length === 0) return;
+    const feedFromHash = getFeedFromHash(feedTypes);
+    console.log('[DEBUG] feedTypes:', feedTypes);
+    console.log('[DEBUG] feed from hash:', feedFromHash);
     if (feedFromHash) {
       setActiveFeed(feedFromHash);
       // DO NOT setFeedHash here!
