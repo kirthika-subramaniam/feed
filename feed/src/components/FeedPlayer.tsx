@@ -37,8 +37,8 @@ function buildFeedMap(feedUrls: string) {
 
 function getFeedFromHash() {
   if (window.location.hash && window.location.hash.includes('feed=')) {
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    return params.get('feed'); // returns 'nasa', 'seeclickfix', etc.
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    return params.get('feed');
   }
   return null;
 }
@@ -64,9 +64,9 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
     console.log('[DEBUG] feed from hash:', feedFromHash);
     if (feedFromHash && feedTypes.includes(feedFromHash)) {
       setActiveFeed(feedFromHash);
-      console.log('[DEBUG] Set activeFeed from hash:', feedFromHash);
-    } else {
-      // Default to first feed type and set hash
+      // DO NOT setFeedHash here!
+    } else if (!feedFromHash) {
+      // Only set default if hash is missing
       const defaultFeedType = feedTypes[0];
       setActiveFeed(defaultFeedType);
       setFeedHash(defaultFeedType);
