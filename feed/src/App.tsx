@@ -38,7 +38,7 @@ function App() {
             NASA Astronomy Picture of the Day
           </Typography>
           <FeedPlayer 
-            feedUrls={nasaFeedUrl}
+            feedUrls={`nasa=${nasaFeedUrl}`}
             feedType="nasa"
             feedFields={['title', 'date', 'explanation', 'url', 'hdurl', 'media_type']}
           />
@@ -48,7 +48,7 @@ function App() {
             Combined Feeds Demo
           </Typography>
           <FeedPlayer 
-            feedUrls={`${nasaFeedUrl}|${seeclickfixUrl}|${bskyUrl}`}
+            feedUrls={`nasa=${nasaFeedUrl}|seeclickfix=${seeclickfixUrl}|bsky=${bskyUrl}`}
             feedType="mixed"
             feedFields={['title', 'date', 'explanation', 'url', 'summary', 'description', 'content', 'media_type']}
           />
