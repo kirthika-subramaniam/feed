@@ -28,91 +28,73 @@ function detectFeedType(url: string): string {
 }
 
 function buildFeedMap(feedUrls: string) {
-  return feedUrls.split('|').reduce((acc, url) => {
-    const type = detectFeedType(url.trim());
-    acc[type] = url.trim();
+  return feedUrls.split('|').reduce((acc, entry) => {
+    const [key, url] = entry.split('=');
+    if (key && url) acc[key.trim()] = url.trim();
     return acc;
   }, {} as Record<string, string>);
 }
 
-function getFeedFromHash(feedTypes: string[]) {
+function getFeedFromHash(feedMap: Record<string, string>) {
   if (window.location.hash && window.location.hash.includes('feed=')) {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const feedParam = params.get('feed');
-    if (!feedParam) return null;
-    // Try to match exact or prefix (type or type-)
-    for (const type of feedTypes) {
-      if (feedParam === type || feedParam.startsWith(type + '-')) {
-        return type;
-      }
+    if (feedParam && feedMap[feedParam]) {
+      return feedParam;
     }
-    return null;
   }
   return null;
 }
 
-function setFeedHash(feedType: string) {
-  window.location.hash = `feed=${encodeURIComponent(feedType)}`;
+function setFeedHash(feedKey: string) {
+  window.location.hash = `feed=${encodeURIComponent(feedKey)}`;
 }
 
 const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default', feedFields = [] }) => {
+  const feedMap = buildFeedMap(feedUrls);
+  const feedKeys = Object.keys(feedMap);
   const [feeds, setFeeds] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFeed, setActiveFeed] = useState<string | null>(null);
 
-  const feedMap = buildFeedMap(feedUrls);
-  const feedTypes = Object.keys(feedMap);
-
-  // On mount, handle hash/feed logic
   useEffect(() => {
-    if (feedTypes.length === 0) return;
-    const feedFromHash = getFeedFromHash(feedTypes);
-    console.log('[DEBUG] feedTypes:', feedTypes);
-    console.log('[DEBUG] feed from hash:', feedFromHash);
+    if (feedKeys.length === 0) return;
+    const feedFromHash = getFeedFromHash(feedMap);
     if (feedFromHash) {
       setActiveFeed(feedFromHash);
-      // DO NOT setFeedHash here!
     } else {
-      // Only set default if hash is missing or invalid
-      const defaultFeedType = feedTypes[0];
-      setActiveFeed(defaultFeedType);
-      setFeedHash(defaultFeedType);
-      console.log('[DEBUG] No valid feed in hash, setting default feed and hash:', defaultFeedType);
+      const defaultFeed = feedKeys[0];
+      setActiveFeed(defaultFeed);
+      setFeedHash(defaultFeed);
     }
   }, [feedUrls]);
 
-  // Listen for hash changes and update activeFeed
   useEffect(() => {
     const onHashChange = () => {
-      const feedFromHash = getFeedFromHash(feedTypes);
-      console.log('[DEBUG] Hash changed, new feed:', feedFromHash);
-      if (feedFromHash && feedTypes.includes(feedFromHash)) {
+      const feedFromHash = getFeedFromHash(feedMap);
+      if (feedFromHash) {
         setActiveFeed(feedFromHash);
       }
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
-  }, [feedTypes]);
+  }, [feedMap]);
 
-  // Handler for feed selection
   const handleFeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newFeedType = e.target.value;
-    setFeedHash(newFeedType); // Only update the hash
-    // Do NOT call setActiveFeed here; let the hashchange event handle it
-    console.log('[DEBUG] Dropdown changed, set hash to:', newFeedType);
+    const newFeedKey = e.target.value;
+    setFeedHash(newFeedKey);
   };
 
   useEffect(() => {
     const fetchFeeds = async () => {
       try {
         if (!activeFeed) return;
-        const selectedUrl = feedMap[activeFeed] || Object.values(feedMap)[0];
+        const selectedUrl = feedMap[activeFeed];
         if (!selectedUrl) throw new Error('No matching feed found for activeFeed');
         const type = detectFeedType(selectedUrl);
         let url = selectedUrl;
         if (type === 'googlesheet') {
-          // Convert to CSV format if needed
           if (!url.includes('/gviz/tq?')) {
             const matches = url.match(/\/d\/(.*?)(\/|$)/);
             if (matches && matches[1]) {
@@ -120,7 +102,6 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
             }
           }
         }
-        console.log('[DEBUG] Fetching feed:', type, url);
         const response = await axios.get(url);
         let data = response.data;
         let items: FeedItem[] = [];
@@ -154,11 +135,9 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
         if (items.length === 0) throw new Error('No feed data available');
         setFeeds(items);
         setLoading(false);
-        console.log('[DEBUG] Feed items loaded:', items.length);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch feed data');
         setLoading(false);
-        console.error('Feed fetch error:', err);
       }
     };
     if (activeFeed) {
@@ -186,9 +165,9 @@ const FeedPlayer: React.FC<FeedPlayerProps> = ({ feedUrls, feedType = 'default',
     <>
       <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
         <select value={activeFeed || ''} onChange={handleFeedChange} style={{ fontSize: '1rem', padding: '0.5rem' }}>
-          {feedTypes.map(type => (
-            <option key={type} value={type}>
-              {type.toUpperCase()} Feed
+          {feedKeys.map(key => (
+            <option key={key} value={key}>
+              {key.toUpperCase()} Feed
             </option>
           ))}
         </select>
