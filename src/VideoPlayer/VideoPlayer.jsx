@@ -51,6 +51,8 @@ function VideoPlayer({
 
   const imageDuration = 4;
 
+  const [isFeedReady, setIsFeedReady] = useState(false); // NEW: Track if feed is ready
+
   const updateURLHash = (feed, ref) => {
     const existingParams = new URLSearchParams(window.location.hash.substring(1));
     const otherParams = new URLSearchParams(); // string containing all the extra params in the URL
@@ -211,31 +213,8 @@ function VideoPlayer({
   }, [mediaList, listofMedia]);
 
   useEffect(() => {
-    console.log("[DEBUG] mediaList on mount:", mediaList);
-    console.log("[DEBUG] window.location.hash on mount:", window.location.hash);
-  }, []);
-
-  useEffect(() => {
     if (mediaList && mediaList.length > 0) {
-      const hash = window.location.hash;
-      console.log("[DEBUG] useEffect [mediaList]: hash=", hash, "mediaList=", mediaList.map(m => m.feed));
-      if (!hash || !hash.includes("feed=")) {
-        console.log("[DEBUG] No feed in hash, calling processMediaList (NASA fallback)");
-        processMediaList();
-      } else {
-        console.log("[DEBUG] Feed found in hash, not calling NASA fallback");
-      }
-      // Otherwise, let the hash-handling useEffects load the correct feed
-    }
-  }, [mediaList]);
-
-  useEffect(() => {
-    const { feed } = parseHash();
-    console.log("[DEBUG] useEffect [mediaList] (hash feed): feed from hash=", feed);
-    if (feed) {
-      const selectedFeed = mediaList.find((media) => media.feed.trim().toLowerCase() === feed.toLowerCase());
-      console.log("[DEBUG] selectedFeed from hash:", selectedFeed);
-      if (selectedFeed) setIndex(mediaList.indexOf(selectedFeed)); // Update dropdown selection
+      processMediaList();
     }
   }, [mediaList]);
 
@@ -276,7 +255,24 @@ function VideoPlayer({
   const loadFeed = async (media, templistofMedia) => {
     try {
       setLoadingFeeds((prev) => ({ ...prev, [media.title]: true }));
-      const mediaItems = await fetchMediaFromAPI(media);
+      // Support pipe-separated URLs
+      let mediaItems = [];
+      if (media.url && media.url.includes("|")) {
+        // Split the URL string and fetch each feed, then combine
+        const urls = media.url.split("|").map((u) => u.trim()).filter(Boolean);
+        for (const url of urls) {
+          // Clone the media object but override the url
+          const mediaClone = { ...media, url };
+          const items = await fetchMediaFromAPI(mediaClone);
+          if (Array.isArray(items)) {
+            mediaItems = mediaItems.concat(items);
+          } else if (items) {
+            mediaItems.push(items);
+          }
+        }
+      } else {
+        mediaItems = await fetchMediaFromAPI(media);
+      }
       templistofMedia[media.title] = Array.isArray(mediaItems) ? mediaItems : [mediaItems];
       setLoadedFeeds((prev) => [...prev, media.feed.trim().toLowerCase()]);
       setListofMedia((prev) => ({
@@ -293,44 +289,26 @@ function VideoPlayer({
   const fetchMediaFromAPI = async (media) => {
     try {
       setActiveFeed(media.feed.trim().toLowerCase());
-      if (media.feed.trim().toLowerCase() === "swiper" && media.url) {
-        if (!swiperData) {
-          return {
-            url: null,
-            text: "Please click on a Swiper Image to view",
-            title: `Failed to load ${media.title}`,
-            isError: true,
-          };
-        }
-        return {
-          url: swiperData.url,
-          text: swiperData.text || "No description available",
-          title: swiperData.title,
-        };
+      // Use localStorage lat/lon for SeeClickFix if present
+      let url = media.url;
+      if (media.feed.trim().toLowerCase() === "seeclickfix-311") {
+        const lat = localStorage.getItem('latitude') || '41.307';
+        const lon = localStorage.getItem('longitude') || '-72.925';
+        // Replace {latitude} and {longitude} placeholders if present
+        url = url.replace('{latitude}', lat).replace('{longitude}', lon);
       }
-      if (media.feed.trim().toLowerCase() === "linkedvideo") {
-        if (!videoData) {
-          return {
-            url: null,
-            text: "Please upload a video link to view",
-            title: `Failed to load ${media.title}`,
-            isError: true,
-          };
-        }
-        return {
-          url: videoData.url,
-          text: videoData.text,
-          title: videoData.title,
-        };
-      }
-      const response = await axios.get(media.url);
+      const response = await axios.get(url);
       switch (media.feed.trim().toLowerCase()) {
         case "seeclickfix-311":
-          return response.data.issues.map((item) => ({
-            url: item.media.image_full || item.media.representative_image_url,
-            text: item.description || "No description available",
-            title: item.summary,
-          }));
+          // Only show first 5 issues with images
+          return response.data.issues
+            .filter(item => item.media && (item.media.image_full || item.media.representative_image_url))
+            .slice(0, 5)
+            .map(item => ({
+              url: item.media.image_full || item.media.representative_image_url,
+              text: item.description || "No description available",
+              title: item.summary,
+            }));
         case "film-scouting":
           return response.data.flatMap((item) => {
             const photos = [];
@@ -387,11 +365,22 @@ function VideoPlayer({
           }));
       }
     } catch (error) {
-      console.error("Error fetching from API for", media.title, ":", error);
+      let errorMessage = "An unknown error occurred.";
+      if (error.response) {
+        if (error.response.status === 429) {
+          errorMessage = "NASA API rate limit exceeded (429). Please use your own API key for more requests. See https://api.nasa.gov/ for details.";
+        } else if (error.response.status === 400) {
+          errorMessage = "Bad request (400): Please check your API key or feed URL.";
+        } else {
+          errorMessage = `Request failed with status code ${error.response.status}`;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
       return [
         {
           url: null,
-          text: `Error: ${error.message || "Unknown error"}`,
+          text: `Error: ${errorMessage}`,
           title: `Failed to load ${media.title}`,
           isError: true,
         },
@@ -730,13 +719,33 @@ function VideoPlayer({
     };
   }, []);
 
+  useEffect(() => {
+    // Wait for hash or default feed to be processed before rendering
+    const { feed } = parseHash();
+    if (feed) {
+      setIsFeedReady(true);
+    } else {
+      // If no hash, set default feed and then mark as ready
+      setTimeout(() => setIsFeedReady(true), 0);
+    }
+  }, []);
+
   // Defensive hash handling: set hash to first feed if missing
   useEffect(() => {
     if (!window.location.hash || !window.location.hash.includes("feed=")) {
-      const defaultFeed = mediaList[0]?.feed || "seeclickfix-311";
+      const defaultFeed = mediaList[0]?.feed || "nasa";
       window.location.hash = `feed=${defaultFeed}`;
     }
   }, [mediaList]);
+
+  if (!isFeedReady) {
+    return (
+      <div className="VideoPlayer__loading">
+        <div className="spinner"></div>
+        <p>Loading feed...</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`VideoPlayer ${isFullScreen ? "fullscreen" : ""}`} ref={containerRef}>
