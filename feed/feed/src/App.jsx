@@ -20,6 +20,7 @@ import VideoPlayer from "./VideoPlayer/VideoPlayer";
 import MemberSense from "./components/MemberSenseComponents/MemberSenseLogin/MemberSense";
 import MemberShowcase from "./components/MemberSenseComponents/MemberShowcase/MemberShowcase";
 import DiscordChannelViewer from "./components/MemberSenseComponents/DiscordChannelViewer/DiscordChannelViewer";
+import FeedPlayer from "./components/FeedPlayer";
 
 // Context
 import ContextProvider from "./Context/ContextGoogle";
@@ -314,15 +315,8 @@ function App() {
     switch (currentView) {
       case "FeedPlayer":
         return (
-          <VideoPlayer
-            autoplay={true}
-            isFullScreen={isFullScreen}
-            setIsFullScreen={setIsFullScreen}
-            handleFullScreen={handleFullScreen}
-            selectedOption={selectedOption}
-            setSelectedOption={setSelectedOption}
-            swiperData={swiperData}
-            setSwiperData={setSwiperData}
+          <FeedPlayer
+            feedUrls="nasa=https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY|seeclickfix-311=https://seeclickfix.com/api/v2/issues?lat=41.307&lng=-72.925&zoom=8&per_page=10|bsky=https://bsky.app/profile/did:plc:ileopdnhib52emw3veem5zxk/rss"
           />
         );
       case "MemberSense":
